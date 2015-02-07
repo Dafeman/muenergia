@@ -1,2 +1,2 @@
-# uEnergia
+# μEnergia
 μEnergia
