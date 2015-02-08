@@ -1,6 +1,6 @@
 # μEnergia
 
-**μEnergia: C++ Framework to Develop Embedded Software**
+### μEnergia: C++ Framework to Develop Embedded Software 
 
 **μEnergia**, pronounced as "micro-Energia", is a software development platform for **MSP-EXP430G2 LaunchPad**, **TivaC Series EK-TM4C123GXL LaunchPad**, and **Tiva C Series TM4C129 ConnectedLaunchPad**. The framework is lightweight, flexible, and consumes minimum memory and computational resources to build applications and rational agents on microcontrollers that sense and actuate using add-on boards.
 
