@@ -34,7 +34,7 @@ To install μEnergia, follow these instructions:
 
 We have also used the framework in: **MSP-EXP430G2 LaunchPad**. 
 
-**datasets** contains the data we collected from humans and robots in our experiments. 
+**datasets** contain the data we collected from humans and robots in our experiments. 
 
 ###### User Guide
 
