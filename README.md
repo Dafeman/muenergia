@@ -2,7 +2,7 @@
 
 ### μEnergia: C++ Framework to Develop Embedded Software 
 
-**μEnergia**, pronounced as "micro-Energia", is a software development platform for **MSP-EXP430G2 LaunchPad**, **TivaC Series EK-TM4C123GXL LaunchPad**, and **Tiva C Series TM4C129 ConnectedLaunchPad**. The framework is lightweight, flexible, and consumes minimum memory and computational resources to build applications and rational agents on microcontrollers that sense and actuate using add-on boards.
+**μEnergia**, pronounced as "micro-Energia", is a software development platform for **TivaC Series EK-TM4C123GXL LaunchPad** and **Tiva C Series TM4C129 ConnectedLaunchPad**. The framework is lightweight, flexible, and consumes minimum memory and computational resources to build applications and rational agents on microcontrollers that sense and actuate using add-on boards.
 
 μEnergia consists of two parts:
 
@@ -22,6 +22,18 @@ To install μEnergia, follow these instructions:
    1. Attach the sensor hub to BoosterPack 1, if you are using a Tiva C Series TM4C1294 Connected LaunchPad Evaluation Kit.
    2. Open Energia GUI and select **muenergia.ino** within the **muenergia** directory.
    3. Select the appropriate board configuration and upload the program.  
+
+μEnergia framework consists:
+
+1. Template.h
+2. Framework.h
+3. Config.h
+4. Framework.cpp
+5. FrameworkDebug.cpp
+6. Config.cpp
+
+We have also used the framework on: **MSP-EXP430G2 LaunchPad**. 
+
 
 ###### User Guide
 
