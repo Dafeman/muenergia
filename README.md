@@ -32,7 +32,7 @@ To install μEnergia, follow these instructions:
 5. FrameworkDebug.cpp
 6. Config.cpp
 
-We have also used the framework on: **MSP-EXP430G2 LaunchPad**. 
+We have also used the framework in: **MSP-EXP430G2 LaunchPad**. 
 
 
 ###### User Guide
