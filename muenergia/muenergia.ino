@@ -7,13 +7,18 @@ void setup()
 {
   // [Default    ]
   //Controller::getInstance().setup(115200);
-  // [UART0_baud_rate, LPRF, [true: target, false: controller], a unique identification number]
+  // [UART0_baud_rate, LPRF, [true: target, false: controller], Duplex [true: target duplex, false: target simplex], ID [a unique identification number]]
   // [Target     ]
-  Controller::getInstance().setup(115200, true, true,  0x7CD);
+  //Controller::getInstance().setup(115200, true, true,  true,  0x7CD);
   // [Controllers]
-  //Controller::getInstance().setup(115200, true, false, 0x8D4);
-  //Controller::getInstance().setup(115200, true, false, 0x7EF);
-  //Controller::getInstance().setup(115200, true, false, 0x8B3);
+  //Controller::getInstance().setup(115200, true, false, true, 0x8D4);
+  //Controller::getInstance().setup(115200, true, false, true, 0x7EF);
+  //Controller::getInstance().setup(115200, true, false, true, 0x8B3);
+  
+  // [target]
+    Controller::getInstance().setup(115200, true, true, false, 0x7EF);
+  // [controller]
+  //Controller::getInstance().setup(115200, true, false, false, 0x7CD);
 }
 
 void loop()

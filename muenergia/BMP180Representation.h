@@ -20,6 +20,13 @@ class BMP180Representation: public BMP180RepresentationBase
         fTemperature(0), fPressure(0), fAltitude(0)
     {
     }
+
+    void serialize(ObjectInput* in, ObjectOutput* out)
+    {
+      SERIALIZE(fTemperature);
+      SERIALIZE(fPressure)
+      SERIALIZE(fAltitude);
+    }
 };
 
 #endif /* BMP180REPRESENTATION_H_ */

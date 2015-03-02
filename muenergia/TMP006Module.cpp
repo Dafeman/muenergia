@@ -265,7 +265,7 @@ void TMP006Module::update(TMP006Representation& theTMP006Representation)
   {
     i32FractionPart *= -1;
   }
-  tivaWare.UART.printf("Ambient %3d.%03d\t", i32IntegerPart, i32FractionPart);
+  //tivaWare.UART.printf("Ambient %3d.%03d\t", i32IntegerPart, i32FractionPart);
 
   //
   // Convert the floating point ambient temperature  to an integer part
@@ -278,6 +278,6 @@ void TMP006Module::update(TMP006Representation& theTMP006Representation)
   {
     i32FractionPart *= -1;
   }
-  tivaWare.UART.printf("Object %3d.%03d\n", i32IntegerPart, i32FractionPart);
+  //tivaWare.UART.printf("Object %3d.%03d\n", i32IntegerPart, i32FractionPart);
 }
 

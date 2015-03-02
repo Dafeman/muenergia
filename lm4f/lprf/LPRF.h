@@ -48,6 +48,7 @@ class LPRF
     LPRF_TYPE nodeType;
     LPRF_TARGET* target;
     LPRF_CONTROLLER* controller;
+    bool duplex;
 
   public:
     static LPRF& getInstance();
@@ -60,8 +61,10 @@ class LPRF
     void thisNodeType(const LPRF_TYPE& nodeType);
     void thisTarget(LPRF_TARGET* target);
     void thisController(LPRF_CONTROLLER* controller);
+    void thisDuplex(const bool& duplex);
     bool isTarget() const;
     bool isController() const;
+    bool isDuplex() const;
     LPRF_TARGET* getTarget() const;
     LPRF_CONTROLLER* getController() const;
     const uint8_t* getIEEEAddr() const;

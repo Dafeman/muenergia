@@ -286,7 +286,7 @@ void SHT21Module::update(SHT21Representation& theSHT21Representation)
   //
   // Print the humidity value using the integers we just created
   //
-  tivaWare.UART.printf("Humidity %3d.%03d\t", i32IntegerPart, i32FractionPart);
+  //tivaWare.UART.printf("Humidity %3d.%03d\t", i32IntegerPart, i32FractionPart);
 
   //
   // Perform the conversion from float to a printable set of integers
@@ -302,7 +302,7 @@ void SHT21Module::update(SHT21Representation& theSHT21Representation)
   //
   // Print the temperature as integer and fraction parts.
   //
-  tivaWare.UART.printf("Temperature %3d.%03d\n", i32IntegerPart, i32FractionPart);
+  //tivaWare.UART.printf("Temperature %3d.%03d\n", i32IntegerPart, i32FractionPart);
 
   //
   // Delay for one second. This is to keep sensor duty cycle

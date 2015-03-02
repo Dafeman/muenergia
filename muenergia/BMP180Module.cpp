@@ -136,7 +136,7 @@ void BMP180Module::update(BMP180Representation& theBMP180Representation)
   //
   // Print temperature with three digits of decimal precision.
   //
-  tivaWare.UART.printf("Temperature %3d.%03d\t\t", i32IntegerPart, i32FractionPart);
+  //tivaWare.UART.printf("Temperature %3d.%03d\t\t", i32IntegerPart, i32FractionPart);
 
   //
   // Get a local copy of the latest air pressure data in float format.
@@ -158,7 +158,7 @@ void BMP180Module::update(BMP180Representation& theBMP180Representation)
   //
   // Print Pressure with three digits of decimal precision.
   //
-  tivaWare.UART.printf("Pressure %3d.%03d\t\t", i32IntegerPart, i32FractionPart);
+  //tivaWare.UART.printf("Pressure %3d.%03d\t\t", i32IntegerPart, i32FractionPart);
 
   //
   // Calculate the altitude.
@@ -181,11 +181,11 @@ void BMP180Module::update(BMP180Representation& theBMP180Representation)
   //
   // Print altitude with three digits of decimal precision.
   //
-  tivaWare.UART.printf("Altitude %3d.%03d", i32IntegerPart, i32FractionPart);
+  //tivaWare.UART.printf("Altitude %3d.%03d", i32IntegerPart, i32FractionPart);
 
   //
   // Print new line.
   //
-  tivaWare.UART.printf("\n");
+  //tivaWare.UART.printf("\n");
 }
 

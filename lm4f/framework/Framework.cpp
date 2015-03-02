@@ -504,10 +504,11 @@ void Controller::initialize(const bool& threadsActivated)
 }
 
 void Controller::setup(unsigned long baudRate, const bool& lprfActive, const bool& lprfTarget,
-    const uint32_t& boosterPack, const bool& threadsActivated)
+    const bool& lprfDuplex, const uint32_t& boosterPack, const bool& threadsActivated)
 {
   tivaWare.LPRF.active = lprfActive;
   tivaWare.LPRF.isTarget = lprfTarget;
+  tivaWare.LPRF.isDuplex = lprfDuplex;
   tivaWare.BOOSTERPACK.ID = boosterPack;
   configureCLOCK();
   configurePORT();

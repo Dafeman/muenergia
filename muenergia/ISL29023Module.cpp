@@ -353,7 +353,7 @@ void ISL29023Module::update(ISL29023Representation& theISL29023Representation)
   //
   // Print the temperature as integer and fraction parts.
   //
-  tivaWare.UART.printf("Visible Lux: %3d.%03d\n", i32IntegerPart, i32FractionPart);
+  //tivaWare.UART.printf("Visible Lux: %3d.%03d\n", i32IntegerPart, i32FractionPart);
 
   //
   // Check if the intensity of light has crossed a threshold. If so

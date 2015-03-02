@@ -505,7 +505,7 @@ class Controller
     void main(const bool& threadsActivated);
 #endif
     /*Give control to other threads*/
-    void setup(unsigned long baudRate, const bool& lprfActive = false, const bool& lprfTarget = false, const uint32_t& boosterPack = 1, const bool& threadsActivated = false);
+    void setup(unsigned long baudRate, const bool& lprfActive = false, const bool& lprfTarget = false, const bool& lprfDuplex = false, const uint32_t& boosterPack = 1, const bool& threadsActivated = false);
     void loop();
     /** verbose */
     void stream();

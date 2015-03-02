@@ -20,6 +20,12 @@ class TMP006Representation: public TMP006RepresentationBase
         fAmbient(0), fObject(0)
     {
     }
+
+    void serialize(ObjectInput* in, ObjectOutput* out)
+    {
+      SERIALIZE(fAmbient);
+      SERIALIZE(fObject);
+    }
 };
 
 #endif /* TMP006REPRESENTATION_H_ */

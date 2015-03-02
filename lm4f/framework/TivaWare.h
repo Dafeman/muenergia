@@ -270,14 +270,14 @@ class LPRFWrapper
 {
   public:
     bool active; //
-    bool isTarget;
+    bool isTarget;bool isDuplex;
     uint32_t maxControllers;
     uint32_t maxPairingTries;
     LPRF& theLPRF;
 
     LPRFWrapper() :
-        active(false), isTarget(false), maxControllers(1/*fixMe*/), maxPairingTries(5), theLPRF(
-            LPRF::getInstance())
+        active(false), isTarget(false), isDuplex(false), maxControllers(1/*fixMe*/), //
+        maxPairingTries(5), theLPRF(LPRF::getInstance())
     {
     }
 

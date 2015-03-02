@@ -10,44 +10,8 @@
 
 #include "framework/Template.h"
 #include "framework/InterruptVectorRepresentation.h"
+#include "LPRFRepresentation.h"
 #include "MPU9150Representation.h"
-
-REPRESENTATION(LPRFMetaRepresentation)
-class LPRFMetaRepresentation: public LPRFMetaRepresentationBase
-{
-  public:
-    int ID;
-    int pktLost;
-
-    LPRFMetaRepresentation() :
-        ID(0), pktLost(0)
-    {
-    }
-    void serialize(ObjectInput* in, ObjectOutput* out)
-    {
-      SERIALIZE(ID);
-      SERIALIZE(pktLost);
-    }
-};
-
-REPRESENTATION(LPRFSyncRepresentation)
-class LPRFSyncRepresentation: public LPRFSyncRepresentationBase
-{
-  public:
-    unsigned long ms; //
-    bool sendActivation;
-    bool resetActivation;
-    LPRFSyncRepresentation() :
-        ms(0), sendActivation(false), resetActivation(false)
-    {
-    }
-    void serialize(ObjectInput* in, ObjectOutput* out)
-    {
-      SERIALIZE(ms);
-      SERIALIZE(sendActivation)
-      SERIALIZE(resetActivation);
-    }
-};
 
 class TX_RX_COMMON
 {

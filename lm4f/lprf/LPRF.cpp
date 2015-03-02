@@ -36,7 +36,7 @@
 LPRF* LPRF::theInstance = 0;
 
 LPRF::LPRF() :
-    nodeType(LPRF_CONTROLLER_TYPE), target(NULL), controller(NULL)
+    nodeType(LPRF_CONTROLLER_TYPE), target(NULL), controller(NULL), duplex(false)
 {
 }
 
@@ -1096,8 +1096,9 @@ void LPRF::update(void)
   if (g_ui8ConfigureLPRF && LPRF::getInstance().isController()
       && (g_vui8LinkState == LINK_STATE_READY))
   {
-    // Enable receiver for the controller FixMe:
-    RTI_RxEnableReq(0xFFFE);
+    // Enable receiver for the controller
+    if (isDuplex())
+      RTI_RxEnableReq(0xFFFE);
     g_ui8ConfigureLPRF = 0;
   }
 }
@@ -1156,7 +1157,7 @@ void LPRF::send()
       }
     }
 
-    if (LPRF::getInstance().isTarget())
+    if (LPRF::getInstance().isTarget() && isDuplex())
     {
       if (!g_ui8Sending && g_ui8SendActivation
           && (g_ui8LinkDestIndexVector.size() == g_tivaWare.LPRF.maxControllers))
@@ -1208,6 +1209,11 @@ void LPRF::thisController(LPRF_CONTROLLER* controller)
   this->controller = controller;
 }
 
+void LPRF::thisDuplex(const bool& duplex)
+{
+  this->duplex = duplex;
+}
+
 bool LPRF::isTarget() const
 {
   return nodeType == LPRF_TARGET_TYPE;
@@ -1216,6 +1222,11 @@ bool LPRF::isTarget() const
 bool LPRF::isController() const
 {
   return nodeType == LPRF_CONTROLLER_TYPE;
+}
+
+bool LPRF::isDuplex() const
+{
+  return duplex;
 }
 
 LPRF_TARGET* LPRF::getTarget() const

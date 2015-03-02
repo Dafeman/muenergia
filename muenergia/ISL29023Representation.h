@@ -20,6 +20,11 @@ class ISL29023Representation: public ISL29023RepresentationBase
     {
     }
 
+    void serialize(ObjectInput* in, ObjectOutput* out)
+    {
+      SERIALIZE(fAmbient);
+    }
+
 };
 
 #endif /* ISL29023REPRESENTATION_H_ */

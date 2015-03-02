@@ -20,6 +20,12 @@ class SHT21Representation: public SHT21RepresentationBase
         fHumidity(0), fTemperature(0)
     {
     }
+
+    void serialize(ObjectInput* in, ObjectOutput* out)
+    {
+      SERIALIZE(fHumidity);
+      SERIALIZE(fTemperature);
+    }
 };
 
 #endif /* SHT21REPRESENTATION_H_ */
