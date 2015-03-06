@@ -32,7 +32,11 @@ To install μEnergia, follow these instructions:
 5. FrameworkDebug.cpp
 6. Config.cpp
 
-We have also used the framework in: **MSP-EXP430G2 LaunchPad**. 
+We have also used the framework with: **MSP-EXP430G2 LaunchPad**. 
+
+The **lm4f/framework** directory contains all the framework files. Our framework is
+independent of hardware specific configurations. Therefore, one can use the 
+framework for other applications (e.g., [topological sorting](http://en.wikipedia.org/wiki/Topological_sorting)). Use the provided **configure** script to build a native binary for such applications. 
 
 **datasets** contain the data we collected from humans and robots in our experiments. 
 
