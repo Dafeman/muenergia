@@ -13,7 +13,7 @@ public class Main {
     public static void main(String[] args) {
         try {
             Serial serial = new Serial("/dev/ttyACM0", 115200, 'N', SerialPort.DATABITS_8, 1);
-            File output = new File("fall_right.txt");
+            File output = new File("march_02_talk.txt");
             MessageConsumer messageConsumer = new FileMessageConsumer(output);
             serial.addListener(messageConsumer);
 
@@ -22,7 +22,7 @@ public class Main {
                     //the following line will keep this app alive for 1000 seconds,
                     //waiting for events to occur and responding to them (printing incoming messages to console).
                     try {
-                        Thread.sleep(1000000);
+                        Thread.sleep(100000000);
                     } catch (InterruptedException ie) {
                     }
                 }

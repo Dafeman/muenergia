@@ -15,7 +15,7 @@ public class FileMessageConsumer implements MessageConsumer {
 
     @Override
     public void message(String s) {
-        System.out.print(s);
+        //System.out.print(s);
         out.print(s);
         out.flush();
     }

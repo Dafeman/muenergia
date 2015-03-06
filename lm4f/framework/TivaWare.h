@@ -276,7 +276,7 @@ class LPRFWrapper
     LPRF& theLPRF;
 
     LPRFWrapper() :
-        active(false), isTarget(false), isDuplex(false), maxControllers(1/*fixMe*/), //
+        active(false), isTarget(false), isDuplex(false), maxControllers(3/*fixMe*/), //
         maxPairingTries(5), theLPRF(LPRF::getInstance())
     {
     }
