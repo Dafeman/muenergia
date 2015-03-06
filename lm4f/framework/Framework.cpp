@@ -28,10 +28,17 @@ Controller* Controller::theInstance = 0;
 /**
  *
  */
+#if defined(EMBEDDED_MODE)
 Controller::Controller() :
     threadsActivated(false), errorState(false), tivaWare(TivaWareController::getInstance())
 {
 }
+#else
+Controller::Controller() :
+    threadsActivated(false), errorState(false)
+{
+}
+#endif
 
 Controller::~Controller()
 {
@@ -506,10 +513,12 @@ void Controller::initialize(const bool& threadsActivated)
 void Controller::setup(unsigned long baudRate, const bool& lprfActive, const bool& lprfTarget,
     const bool& lprfDuplex, const uint32_t& boosterPack, const bool& threadsActivated)
 {
+#if defined(EMBEDDED_MODE)
   tivaWare.LPRF.active = lprfActive;
   tivaWare.LPRF.isTarget = lprfTarget;
   tivaWare.LPRF.isDuplex = lprfDuplex;
   tivaWare.BOOSTERPACK.ID = boosterPack;
+#endif
   configureCLOCK();
   configurePORT();
   configureHAL();

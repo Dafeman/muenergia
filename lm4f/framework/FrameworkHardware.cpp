@@ -29,6 +29,7 @@
 
 void Controller::configureCLOCK()
 {
+#if defined(TARGET_IS_BLIZZARD_RB1) || defined(TARGET_IS_SNOWFLAKE_RA0)
   ///
   // Enable lazy stacking for interrupt handlers.  This allows floating-point
   // instructions to be used within interrupt handlers, but at the expense of
@@ -36,6 +37,7 @@ void Controller::configureCLOCK()
   //
   ROM_FPUEnable();
   ROM_FPULazyStackingEnable();
+#endif
 
 #ifdef TARGET_IS_BLIZZARD_RB1
   //
@@ -44,7 +46,7 @@ void Controller::configureCLOCK()
   SysCtlClockSet(SYSCTL_SYSDIV_2_5 | SYSCTL_USE_PLL | SYSCTL_XTAL_16MHZ | SYSCTL_OSC_MAIN);
   tivaWare.CLOCK.ui32SrcClock = 16000000;
   tivaWare.CLOCK.ui32SysClock = ROM_SysCtlClockGet(); // This is F_CPU
-#else
+#elif TARGET_IS_SNOWFLAKE_RA0
       //
       // Configure the system clock to run at 120MHz.
       //
@@ -63,6 +65,7 @@ void Controller::configureCLOCK()
 
 void Controller::configureUART(unsigned long baudRate)
 {
+#if defined(TARGET_IS_BLIZZARD_RB1) || defined(TARGET_IS_SNOWFLAKE_RA0)
   //
   // Enable the GPIO Peripheral used by the UART.
   //
@@ -79,6 +82,7 @@ void Controller::configureUART(unsigned long baudRate)
   ROM_GPIOPinConfigure(GPIO_PA0_U0RX);
   ROM_GPIOPinConfigure(GPIO_PA1_U0TX);
   ROM_GPIOPinTypeUART(GPIO_PORTA_BASE, GPIO_PIN_0 | GPIO_PIN_1);
+#endif
 
 #ifdef TARGET_IS_BLIZZARD_RB1
   //
@@ -87,11 +91,13 @@ void Controller::configureUART(unsigned long baudRate)
   UARTClockSourceSet(UART0_BASE, UART_CLOCK_PIOSC);
 #endif
 
+#if defined(TARGET_IS_BLIZZARD_RB1) || defined(TARGET_IS_SNOWFLAKE_RA0)
   //
   // Initialize the UART for console I/O.
   //
   tivaWare.UART.initUART(0, baudRate, tivaWare.CLOCK.ui32SrcClock, tivaWare.CLOCK.ui32SysClock);
   tivaWare.UART.printf("UART0_BASE with UARTStdioIntHandler\n");
+#endif
 }
 
 void Controller::configureLED()
@@ -105,7 +111,7 @@ void Controller::configureLED()
   tivaWare.LED.colorSetRGB(0, 0, 0);
   tivaWare.LED.intensitySetRGB(0.1f);
   tivaWare.LED.enableRGB();
-#else
+#elif TARGET_IS_SNOWFLAKE_RA0
   //
   // Turn on the LED to show a transaction is starting.
   //
@@ -115,8 +121,10 @@ void Controller::configureLED()
 
 void Controller::configureBUTTON()
 {
+#if defined(TARGET_IS_BLIZZARD_RB1) || defined(TARGET_IS_SNOWFLAKE_RA0)
   TivaWareController::getInstance().BUTTONS.initButtons();
   tivaWare.UART.printf("BUTTON: enabled\n");
+#endif
 }
 
 void Controller::configureRADIO()
@@ -173,7 +181,7 @@ void Controller::configurePORT()
   GPIOIntEnable(GPIO_PORTE_BASE, GPIO_PIN_5);
   ROM_GPIOIntTypeSet(GPIO_PORTE_BASE, GPIO_PIN_5, GPIO_FALLING_EDGE);
   ROM_IntEnable(INT_GPIOE);
-#else
+#elif TARGET_IS_SNOWFLAKE_RA0
   //
   // Configure and Enable the GPIO interrupt. Used for DRDY from the TMP006
   //
@@ -228,7 +236,7 @@ void Controller::configureHAL()
   ROM_SysCtlPeripheralSleepEnable(SYSCTL_PERIPH_TIMER1);
   ROM_SysCtlPeripheralSleepEnable(SYSCTL_PERIPH_I2C3);
   ROM_SysCtlPeripheralSleepEnable(SYSCTL_PERIPH_WTIMER5);
-#else
+#elif TARGET_IS_SNOWFLAKE_RA0
   //
   // Keep only some parts of the systems running while in sleep mode.
   // GPIOH is for the TMP006 data ready interrupt.
@@ -247,6 +255,8 @@ void Controller::configureHAL()
   ROM_SysCtlPeripheralSleepEnable(SYSCTL_PERIPH_I2C7);
 #endif
 
+
+#if defined(TARGET_IS_BLIZZARD_RB1) || defined(TARGET_IS_SNOWFLAKE_RA0)
   //
   // Enable timer 3
   //
@@ -288,6 +298,7 @@ void Controller::configureHAL()
   ROM_SysTickPeriodSet(tivaWare.CLOCK.ui32SysClock / tivaWare.CLOCK.ui32SysTickHz);
   ROM_SysTickIntEnable();
   ROM_SysTickEnable();
+#endif
 
 }
 
@@ -312,7 +323,7 @@ void Controller::configurePRIORITY()
   ROM_IntPrioritySet(INT_UART0, 0x70);
   ROM_IntPrioritySet(INT_GPIOE, 0x80);
   ROM_IntPrioritySet(INT_WTIMER5B, 0x80);
-#else
+#elif TARGET_IS_SNOWFLAKE_RA0
   //
   // Configure desired interrupt priorities.  Setting the I2C interrupt to be
   // of more priority than SysTick and the GPIO interrupt means those
@@ -338,7 +349,10 @@ void Controller::configurePRIORITY()
 
 void Controller::configureI2C()
 {
+#if defined(TARGET_IS_BLIZZARD_RB1) || defined(TARGET_IS_SNOWFLAKE_RA0)
   tivaWare.I2C.initI2CM();
+#endif
+
 #ifdef TARGET_IS_BLIZZARD_RB1
   //
   // The I2C3 peripheral must be enabled before use.
@@ -375,7 +389,7 @@ void Controller::configureI2C()
   // Initialize I2C3 peripheral.
   //
   I2CMInit(&tivaWare.I2C.instance, I2C3_BASE, INT_I2C3, 0xff, 0xff, tivaWare.CLOCK.ui32SysClock);
-#else
+#elif TARGET_IS_SNOWFLAKE_RA0
   //
   // The I2C7 peripheral must be enabled before use.
   //
@@ -412,7 +426,10 @@ void Controller::configureI2C()
   I2CMInit(&tivaWare.I2C.instance, I2C7_BASE, INT_I2C7, 0xff, 0xff, tivaWare.CLOCK.ui32SysClock);
 
 #endif
+
+#if defined(EMBEDDED_MODE)
   tivaWare.UART.printf("I2CM: I2CX with frameworkI2CIntHandler\n");
+#endif
 }
 
 extern "C"
@@ -422,14 +439,16 @@ extern "C"
 // Called by the NVIC as a result of I2C3 Interrupt.
 //
 //*****************************************************************************
-void I2CXIntHandler(void)
-{
-  //
-  // Pass through to the I2CM interrupt handler provided by sensor library.
-  // This is required to be at application level so that I2CMIntHandler can
-  // receive the instance structure pointer as an argument.
-  //
-  if (TivaWareController::getInstance().I2C.initialized())
-    I2CMIntHandler(&TivaWareController::getInstance().I2C.instance);
-}
+  void I2CXIntHandler(void)
+  {
+#if defined(TARGET_IS_BLIZZARD_RB1) || defined(TARGET_IS_SNOWFLAKE_RA0)
+    //
+    // Pass through to the I2CM interrupt handler provided by sensor library.
+    // This is required to be at application level so that I2CMIntHandler can
+    // receive the instance structure pointer as an argument.
+    //
+    if (TivaWareController::getInstance().I2C.initialized())
+      I2CMIntHandler(&TivaWareController::getInstance().I2C.instance);
+#endif
+  }
 }

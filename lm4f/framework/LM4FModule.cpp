@@ -7,8 +7,10 @@
 
 #include "LM4FModule.h"
 //
+#if defined(ENERGIA)
 #include "inc/hw_sysctl.h"
 #include "driverlib/timer.h"
+#endif
 
 MAKE_MODULE(LM4FModule)
 
@@ -27,6 +29,7 @@ static bool g_interruptedTimer3;
 //*****************************************************************************
 volatile uint_fast8_t g_ui8Buttons;
 //
+#if defined(ENERGIA)
 static TivaWareController& g_tivaWare = TivaWareController::getInstance();
 
 extern "C"
@@ -250,9 +253,13 @@ void LM4FSysTickHandler(uint32_t ui32TimeMS)
 }
 }
 
+#endif
+
 void LM4FModule::init()
 {
+#if defined(ENERGIA)
   registerSysTickCb(LM4FSysTickHandler);
+#endif
 }
 
 void LM4FModule::update(InterruptVectorRepresentation& theInterruptVectorRepresentation)

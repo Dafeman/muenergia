@@ -100,7 +100,7 @@ void Controller::stream()
   {
     const Controller::RepresentationEntry* representationEntry = *iter;
     std::cout << representationEntry->representationNode->getName() << " "
-    << representationEntry->providedModuleName << std::endl;
+        << representationEntry->providedModuleName << std::endl;
   }
 
   std::cout << std::endl;
@@ -110,7 +110,7 @@ void Controller::stream()
     std::cout << thread->threadName << std::endl;
     std::cout << "graphStructureVector.size()=" << thread->graphStructureVector.size() << std::endl;
     std::cout << "thread->transferredVector.size()=" << thread->transferredVector.size()
-    << std::endl;
+        << std::endl;
     for (Thread::NodeVector::iterator iter2 = thread->graphStructureVector.begin();
         iter2 != thread->graphStructureVector.end(); iter2++)
     {
@@ -162,11 +162,11 @@ void Controller::stream()
       {
         const Node* x = *iter2;
         if (x->isComputationNode())
-        graph << "\t node [shape=box, fillcolor=\"green:yellow\","
-        << " style=filled, penwidth=2, gradientangle=270]; \n";
+          graph << "\t node [shape=box, fillcolor=\"green:yellow\","
+              << " style=filled, penwidth=2, gradientangle=270]; \n";
         else
-        graph << "\t node [shape=ellipse, fillcolor=\"gold:yellow\","
-        << " style=filled, penwidth=2, gradientangle=270]; \n";
+          graph << "\t node [shape=ellipse, fillcolor=\"gold:yellow\","
+              << " style=filled, penwidth=2, gradientangle=270]; \n";
         graph << " " << x->getName() << "; \n";
       }
       graph << "\n";
@@ -176,7 +176,7 @@ void Controller::stream()
       {
         Node* x = *iter2;
         graph << "\t node [shape=egg, fillcolor=\"orange:yellow\","
-        << " style=filled, penwidth=2, gradientangle=270]; \n";
+            << " style=filled, penwidth=2, gradientangle=270]; \n";
         graph << " " << x->getName() << "; \n";
       }
       graph << "\n";
@@ -197,7 +197,7 @@ void Controller::stream()
           }
         }
         if (x->getNextNodes().empty())
-        graph << "\t" << x->getName() << "; \n";
+          graph << "\t" << x->getName() << "; \n";
       }
 
       for (Thread::NodeVector::iterator iter2 = thread->operationVector.begin();
@@ -211,14 +211,14 @@ void Controller::stream()
           if (x->getThreadIndex() == y->getThreadIndex())
           {
             if (y->isComputationNode())
-            graph << "edge [color=black]; \n";
+              graph << "edge [color=black]; \n";
             else
-            graph << "edge [color=blue]; \n";
+              graph << "edge [color=blue]; \n";
             graph << "\t" << x->getName() << " -> " << y->getName() << "; \n";
           }
         }
         if (x->getNextNodes().empty())
-        graph << "\t" << x->getName() << "; \n";
+          graph << "\t" << x->getName() << "; \n";
 
       }
       graph << "edge [color=red]; \n";
@@ -248,3 +248,12 @@ void Controller::stream()
   }
 #endif
 }
+
+#if !defined(EMBEDDED_MODE)
+// Framework main
+int main(int argc, char** argv)
+{
+  Controller::getInstance().main(true);
+  return 0;
+}
+#endif

@@ -439,7 +439,9 @@ class Controller
     typedef std::string strand;
 #endif
     strand errorMsg;
+#if defined(EMBEDDED_MODE)
     TivaWareController& tivaWare;
+#endif
 
     typedef Vector<ModuleEntry*> ModuleVector;
     typedef Vector<RepresentationEntry*> RepresentationVector;
