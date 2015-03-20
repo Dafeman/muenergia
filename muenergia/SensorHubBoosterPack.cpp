@@ -15,8 +15,8 @@
 #include "BQ27510G3Module.h"
 //
 
-//#define LPRF_SENSOR_TARGET
-#define LPRF_SENSOR_CONTROLLER
+#define LPRF_SENSOR_TARGET
+//#define LPRF_SENSOR_CONTROLLER
 
 #ifdef LPRF_SENSOR_TARGET
 MAKE_MODULE(LPRFSensorTargetModule)

@@ -9,8 +9,10 @@
 #define BQ27510G3MODULE_H_
 
 #include "framework/Template.h"
+#include "SensorAccessRepresentation.h"
 
 MODULE(BQ27510G3Module)
+  USES(SensorAccessRepresentation) //
 END_MODULE
 class BQ27510G3Module: public BQ27510G3ModuleBase
 {

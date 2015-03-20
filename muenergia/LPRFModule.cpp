@@ -12,9 +12,9 @@
 #include "drivers/buttons.h"
 //
 // Global variable
-bool g_sendActivation = false;
-bool g_startPersistanceStorage = false;
-bool g_resetActivation = false;
+static bool g_sendActivation = false;
+static bool g_startPersistanceStorage = false;
+static bool g_resetActivation = false;
 
 LPRFModule::LPRFModule() :
     sendLoop(false)

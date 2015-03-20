@@ -318,6 +318,9 @@ void ISL29023Module::init()
 
 void ISL29023Module::update(ISL29023Representation& theISL29023Representation)
 {
+  if (!theSensorAccessRepresentation.isNull() && !theSensorAccessRepresentation->active)
+    return;
+
   if (!theInterruptVectorRepresentation->interruptedSysTick)
     return;
   //

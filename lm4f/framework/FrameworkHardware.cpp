@@ -136,8 +136,8 @@ void Controller::configureRADIO()
     // Initialize the Radio Systems.
     //
     tivaWare.LPRF.initLPRF();
-    tivaWare.UART.printf("UART1_BASE with RemoTIUARTIntHandler; target=%d\n",
-        tivaWare.LPRF.isTarget);
+    tivaWare.UART.printf("UART1_BASE with RemoTIUARTIntHandler; target=%d duplex=%d \n",
+        tivaWare.LPRF.isTarget, tivaWare.LPRF.isDuplex);
   }
 #endif
 }

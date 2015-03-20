@@ -215,8 +215,11 @@ void TMP006Module::init()
 
 void TMP006Module::update(TMP006Representation& theTMP006Representation)
 {
-  if (!theInterruptVectorRepresentation->interruptedTMP006)
+  if (!theSensorAccessRepresentation.isNull() && !theSensorAccessRepresentation->active)
     return;
+
+  //if (!theInterruptVectorRepresentation->interruptedTMP006)
+  //  return;
 
   //
   // This interrupt indicates a conversion is complete and ready to be
@@ -265,6 +268,7 @@ void TMP006Module::update(TMP006Representation& theTMP006Representation)
   {
     i32FractionPart *= -1;
   }
+
   //tivaWare.UART.printf("Ambient %3d.%03d\t", i32IntegerPart, i32FractionPart);
 
   //
@@ -278,6 +282,7 @@ void TMP006Module::update(TMP006Representation& theTMP006Representation)
   {
     i32FractionPart *= -1;
   }
+
   //tivaWare.UART.printf("Object %3d.%03d\n", i32IntegerPart, i32FractionPart);
 }
 

@@ -202,6 +202,9 @@ void SHT21Module::init()
 
 void SHT21Module::update(SHT21Representation& theSHT21Representation)
 {
+  if (!theSensorAccessRepresentation.isNull() && !theSensorAccessRepresentation->active)
+    return;
+
   int32_t i32IntegerPart;
   int32_t i32FractionPart;
 

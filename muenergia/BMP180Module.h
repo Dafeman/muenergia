@@ -11,10 +11,12 @@
 #include "framework/Template.h"
 #include "framework/InterruptVectorRepresentation.h"
 #include "BMP180Representation.h"
+#include "SensorAccessRepresentation.h"
 
 MODULE(BMP180Module)
   REQUIRES(InterruptVectorRepresentation) //
   PROVIDES(BMP180Representation) //
+  USES(SensorAccessRepresentation)
 END_MODULE
 class BMP180Module: public BMP180ModuleBase
 {

@@ -11,10 +11,12 @@
 #include "framework/Template.h"
 #include "framework/InterruptVectorRepresentation.h"
 #include "TMP006Representation.h"
+#include "SensorAccessRepresentation.h"
 
 MODULE(TMP006Module)
   REQUIRES(InterruptVectorRepresentation) //
   PROVIDES(TMP006Representation) //
+  USES(SensorAccessRepresentation)
 END_MODULE
 class TMP006Module: public TMP006ModuleBase
 {

@@ -11,10 +11,12 @@
 #include "framework/Template.h"
 #include "framework/InterruptVectorRepresentation.h"
 #include "ISL29023Representation.h"
+#include "SensorAccessRepresentation.h"
 
 MODULE(ISL29023Module)
   REQUIRES(InterruptVectorRepresentation) //
   PROVIDES(ISL29023Representation) //
+  USES(SensorAccessRepresentation)
 END_MODULE
 class ISL29023Module: public ISL29023ModuleBase
 {

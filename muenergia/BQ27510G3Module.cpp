@@ -1058,6 +1058,8 @@ void BQ27510G3Module::init()
 
 void BQ27510G3Module::execute()
 {
+  if (!theSensorAccessRepresentation.isNull() && !theSensorAccessRepresentation->active)
+    return;
   //
   // Begin the data collection and printing.  Loop Forever.
   //

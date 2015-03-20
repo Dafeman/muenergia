@@ -11,6 +11,8 @@
 #include "utils/z85.h"
 #include "drivers/buttons.h"
 
+static bool g_controllerSendActivation = false;
+
 // ============================================================================
 LPRFSensorControllerModule::LPRFSensorControllerModule() :
     controller(0)
@@ -29,13 +31,80 @@ void LPRFSensorControllerModule::init()
   tivaWare.LPRF.controllerLPRF(controller);
 }
 
-void LPRFSensorControllerModule::execute()
+void LPRFSensorControllerModule::update(SensorAccessRepresentation& theSensorAccessRepresentation)
 {
+  static unsigned long prevTime = millis();
+  static int state = 0;
+
   if (!tivaWare.LPRF.active)
     return;
 
   tivaWare.LPRF.updateLPRF();
-  tivaWare.LPRF.sendLPRF();
+
+  if (!LPRF::getInstance().getConnected() && theInterruptVectorRepresentation->interruptedSysTick)
+    return;
+
+  // preamble
+  if (!controller->contentMsg && theInterruptVectorRepresentation->interruptedSysTick)
+  {
+    if (g_controllerSendActivation)
+    {
+      UARTprintf("preamble set!\n");
+      controller->contentMsg = true;
+    }
+    else
+    {
+      if ((millis() - prevTime) > 3000)
+      {
+        tivaWare.LPRF.sendLPRF();
+        UARTprintf("sending preamble: \n");
+        prevTime = millis();
+      }
+      return;
+    }
+  }
+
+  if (!controller->contentMsg)
+    return;
+
+  if (state == 0 && g_controllerSendActivation)
+  {
+    UARTprintf("received activation\n");
+    prevTime = millis();
+    ++state;
+  }
+
+  if (state == 1 && ((millis() - prevTime) > 1000))
+  {
+    ++state;
+    prevTime = millis();
+  }
+
+  if (state == 2 && ((millis() - prevTime) > 1000))
+  {
+    ++state;
+    theSensorAccessRepresentation.active = true;
+    prevTime = millis();
+    UARTprintf("reading sensor data\n");
+  }
+
+  if (state == 3 && ((millis() - prevTime) > 3000)) // send data
+  {
+    theSensorAccessRepresentation.active = false;
+    if (g_controllerSendActivation)
+    {
+      UARTprintf("sending sensor data ...\n");
+      tivaWare.LPRF.sendLPRF();
+      g_controllerSendActivation = false; // fixme
+    }
+    ++state;
+  }
+
+  if ((state == 4) && (millis() - prevTime) > 2000)
+  {
+    UARTprintf("ready for next data\n");
+    state = 0;
+  }
 }
 
 // ============================================================================
@@ -51,7 +120,7 @@ LPRFSensorTargetModule::~LPRFSensorTargetModule()
 
 void LPRFSensorTargetModule::init()
 {
-  target = new SensorTarget;
+  target = new SensorTarget(theInterruptVectorRepresentation);
   tivaWare.LPRF.targetLPRF(target);
 }
 
@@ -64,6 +133,7 @@ void LPRFSensorTargetModule::execute()
   {
     //UARTprintf("target: \n", millis());
     tivaWare.LPRF.updateLPRF();
+    tivaWare.LPRF.sendLPRF();
   }
 }
 
@@ -71,7 +141,8 @@ void LPRFSensorTargetModule::execute()
 
 // ============================================================================
 SensorCommon::SensorCommon() :
-    buffLocation(0)
+    buffLocation(0), receiveLocation(0), sendLocation(0), syncPktLength(
+        sizeof(long int) + sizeof(bool))
 {
   memset(buffer, 0, LPRF_TX_MAX_DATA_LEN * sizeof(unsigned char));
   memset(encodedStr, 0, LPRF_TX_MAX_DATA_LEN * sizeof(char));
@@ -85,7 +156,8 @@ SensorController::SensorController(const BMP180Representation* theBMP180Represen
     theBMP180Representation(theBMP180Representation), //
     theISL29023Representation(theISL29023Representation), //
     theSHT21Representation(theSHT21Representation), //
-    theTMP006Representation(theTMP006Representation)
+    theTMP006Representation(theTMP006Representation), //
+    contentMsg(false)
 {
 }
 
@@ -107,7 +179,16 @@ void SensorController::reset()
 void SensorController::receive(uint8_t ui8SrcIndex, uint8_t ui8ProfileId, uint16_t ui16VendorID,
     uint8_t ui8RXLinkQuality, uint8_t ui8RXFlags, uint8_t ui8Length, uint8_t *pui8Data)
 {
-  // Target is simplex. Therefore, controller does not receive anything.
+  receiveLocation = Z85_decode_with_padding((const char*) pui8Data, (char*) buffer, ui8Length);
+  if (receiveLocation >= syncPktLength)
+  {
+    ((Serializable*) &repSync)->readFromBuffer(buffer);
+    UARTprintf("SensorController mills: %d sendActivation: %d\n", repSync.ms,
+        repSync.sendActivation);
+    //g_controllerSendActivation = repSync.sendActivation;
+    g_controllerSendActivation = true;
+  }
+  receiveLocation = 0;
 }
 
 void SensorController::execute()
@@ -116,22 +197,27 @@ void SensorController::execute()
   buffLocation = LPRF_DATA_OFFSET_BYTES;
   repMeta.ID = TivaWareController::getInstance().BOOSTERPACK.ID;
   buffLocation += ((Serializable*) &repMeta)->writeToBuffer(buffer + buffLocation);
-  buffLocation += ((Serializable*) theBMP180Representation)->writeToBuffer(buffer + buffLocation);
-  buffLocation += ((Serializable*) theISL29023Representation)->writeToBuffer(buffer + buffLocation);
-  buffLocation += ((Serializable*) theSHT21Representation)->writeToBuffer(buffer + buffLocation);
-  buffLocation += ((Serializable*) theTMP006Representation)->writeToBuffer(buffer + buffLocation);
+  if (contentMsg)
+  {
+    buffLocation += ((Serializable*) theBMP180Representation)->writeToBuffer(buffer + buffLocation);
+    buffLocation += ((Serializable*) theISL29023Representation)->writeToBuffer(
+        buffer + buffLocation);
+    buffLocation += ((Serializable*) theSHT21Representation)->writeToBuffer(buffer + buffLocation);
+    buffLocation += ((Serializable*) theTMP006Representation)->writeToBuffer(buffer + buffLocation);
+  }
   buffLocation = Z85_encode_with_padding((const char*) buffer, encodedStr, buffLocation);
 }
 
 // ============================================================================
-SensorTarget::SensorTarget() :
-    i32IntegerPart(0), i32FractionPart(0)
+SensorTarget::SensorTarget(const InterruptVectorRepresentation* theInterruptVectorRepresentation) :
+    theInterruptVectorRepresentation(theInterruptVectorRepresentation), i32IntegerPart(0), //
+    i32FractionPart(0)
 {
 }
 
 uint8_t SensorTarget::size() const
 {
-  return buffLocation;
+  return sendLocation;
 }
 
 uint8_t* SensorTarget::data() const
@@ -141,12 +227,39 @@ uint8_t* SensorTarget::data() const
 
 void SensorTarget::execute()
 {
-  // Target is simplex.
+  switch (theInterruptVectorRepresentation->buttons & ALL_BUTTONS)
+  {
+    //
+    // Right button is pressed at startup.
+    //
+    case RIGHT_BUTTON:
+    {
+      TivaWareController::getInstance().LED.colorSetRGB(0x0, 0x4000, 0x4000);
+      repSync.sendActivation = true;
+      break;
+    }
+
+    case LEFT_BUTTON:
+    {
+      TivaWareController::getInstance().LED.colorSetRGB(0x4000, 0x4000, 0x0);
+      repSync.sendActivation = false;
+      repSync.resetActivation = true;
+      UARTprintf("EOE\n"); // end-of-episode
+      break;
+    }
+
+  }
+
+  repSync.ms = millis();
+  sendLocation = ((Serializable*) &repSync)->writeToBuffer(buffer);
+  sendLocation = Z85_encode_with_padding((const char*) buffer, encodedStr, sendLocation);
+  repSync.resetActivation = false;
+  //UARTprintf("SensorTarget::execute()\n");
 }
 
 void SensorTarget::reset()
 {
-  buffLocation = 0;
+  sendLocation = 0;
 }
 
 void SensorTarget::receive(uint8_t ui8SrcIndex, uint8_t ui8ProfileId, uint16_t ui16VendorID,
@@ -175,9 +288,14 @@ void SensorTarget::receive(uint8_t ui8SrcIndex, uint8_t ui8ProfileId, uint16_t u
     UARTprintff(repSHT21.fTemperature);
     //
     UARTprintff(repTMP006.fAmbient);
+    UARTprintf(" %u ", millis());
     UARTprintf("\n"); // flush
     // Some delay
-    ROM_SysCtlDelay(TivaWareController::getInstance().CLOCK.ui32SysClock / (1000 * 3)); // 1 ms
+    ROM_SysCtlDelay(TivaWareController::getInstance().CLOCK.ui32SysClock / (100 * 3)); // 10 ms
+  }
+  else
+  {
+    UARTprintf("msg(%d): %d \n", ui8SrcIndex, ui8Length);
   }
 }
 

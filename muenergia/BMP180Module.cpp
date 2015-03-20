@@ -89,6 +89,9 @@ void BMP180Module::init()
 
 void BMP180Module::update(BMP180Representation& theBMP180Representation)
 {
+  if (!theSensorAccessRepresentation.isNull() && !theSensorAccessRepresentation->active)
+    return;
+
   if (!theInterruptVectorRepresentation->interruptedSysTick)
     return;
   //

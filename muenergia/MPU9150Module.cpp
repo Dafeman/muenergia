@@ -339,6 +339,9 @@ void MPU9150Module::init()
 
 void MPU9150Module::update(MPU9150Representation& theMPU9150Representation)
 {
+  if (!theSensorAccessRepresentation.isNull() && !theSensorAccessRepresentation->active)
+    return;
+
   theMPU9150Representation.bUpdated = false;
   if (!(/*theInterruptVectorRepresentation->interruptedMPU9150 ||*/theInterruptVectorRepresentation->interruptedTimer3/*50Hz*/))
     return;
@@ -360,105 +363,105 @@ void MPU9150Module::update(MPU9150Representation& theMPU9150Representation)
 
   switch (g_ui8MotionState)
   {
-  //
-  // This is our initial data set from the MPU9150, start the DCM.
-  //
-  case MOTION_STATE_INIT:
-  {
     //
-    // Check the read data buffer of the MPU9150 to see if the
-    // Magnetometer data is ready and present. This may not be the case
-    // for the first few data captures.
+    // This is our initial data set from the MPU9150, start the DCM.
     //
-    if (g_sMPU9150Inst.pui8Data[14] & AK8975_ST1_DRDY)
+    case MOTION_STATE_INIT:
     {
       //
-      // Get local copy of Accel and Mag data to feed to the DCM
-      // start.
+      // Check the read data buffer of the MPU9150 to see if the
+      // Magnetometer data is ready and present. This may not be the case
+      // for the first few data captures.
       //
-      MPU9150DataAccelGetRaw(&g_sMPU9150Inst, g_pui16Accel, g_pui16Accel + 1, g_pui16Accel + 2);
-      MPU9150DataAccelGetFloat(&g_sMPU9150Inst, g_pfAccel, g_pfAccel + 1, g_pfAccel + 2);
-      MPU9150DataMagnetoGetRaw(&g_sMPU9150Inst, g_pui16Mag, g_pui16Mag + 1, g_pui16Mag + 2);
-      MPU9150DataMagnetoGetFloat(&g_sMPU9150Inst, g_pfMag, g_pfMag + 1, g_pfMag + 2);
-      MPU9150DataGyroGetRaw(&g_sMPU9150Inst, g_pui16Gyro, g_pui16Gyro + 1, g_pui16Gyro + 2);
-      MPU9150DataGyroGetFloat(&g_sMPU9150Inst, g_pfGyro, g_pfGyro + 1, g_pfGyro + 2);
+      if (g_sMPU9150Inst.pui8Data[14] & AK8975_ST1_DRDY)
+      {
+        //
+        // Get local copy of Accel and Mag data to feed to the DCM
+        // start.
+        //
+        MPU9150DataAccelGetRaw(&g_sMPU9150Inst, g_pui16Accel, g_pui16Accel + 1, g_pui16Accel + 2);
+        MPU9150DataAccelGetFloat(&g_sMPU9150Inst, g_pfAccel, g_pfAccel + 1, g_pfAccel + 2);
+        MPU9150DataMagnetoGetRaw(&g_sMPU9150Inst, g_pui16Mag, g_pui16Mag + 1, g_pui16Mag + 2);
+        MPU9150DataMagnetoGetFloat(&g_sMPU9150Inst, g_pfMag, g_pfMag + 1, g_pfMag + 2);
+        MPU9150DataGyroGetRaw(&g_sMPU9150Inst, g_pui16Gyro, g_pui16Gyro + 1, g_pui16Gyro + 2);
+        MPU9150DataGyroGetFloat(&g_sMPU9150Inst, g_pfGyro, g_pfGyro + 1, g_pfGyro + 2);
+
+        //
+        // Feed the initial measurements to the DCM and start it.
+        // Due to the structure of our MotionMagCallback function,
+        // the floating point magneto data is already in the local
+        // data buffer.
+        //
+        CompDCMMagnetoUpdate(&g_sCompDCMInst, g_pfMag[0], g_pfMag[1], g_pfMag[2]);
+        CompDCMAccelUpdate(&g_sCompDCMInst, g_pfAccel[0], g_pfAccel[1], g_pfAccel[2]);
+        CompDCMStart(&g_sCompDCMInst);
+
+        //
+        // Proceed to the run state.
+        //
+        g_ui8MotionState = MOTION_STATE_RUN;
+      }
 
       //
-      // Feed the initial measurements to the DCM and start it.
-      // Due to the structure of our MotionMagCallback function,
-      // the floating point magneto data is already in the local
-      // data buffer.
+      // Finished
       //
-      CompDCMMagnetoUpdate(&g_sCompDCMInst, g_pfMag[0], g_pfMag[1], g_pfMag[2]);
-      CompDCMAccelUpdate(&g_sCompDCMInst, g_pfAccel[0], g_pfAccel[1], g_pfAccel[2]);
-      CompDCMStart(&g_sCompDCMInst);
-
-      //
-      // Proceed to the run state.
-      //
-      g_ui8MotionState = MOTION_STATE_RUN;
+      break;
     }
 
-    //
-    // Finished
-    //
-    break;
-  }
+      //
+      // DCM has been started and we are ready for normal operations.
+      //
+    case MOTION_STATE_RUN:
+    {
+      //
+      // Get the latest Euler data from the DCM. DCMUpdate is done
+      // inside the interrupt routine to insure it is not skipped and
+      // that the timing is consistent.
+      //
+      CompDCMComputeEulers(&g_sCompDCMInst, g_pfEulers, g_pfEulers + 1, g_pfEulers + 2);
 
-    //
-    // DCM has been started and we are ready for normal operations.
-    //
-  case MOTION_STATE_RUN:
-  {
-    //
-    // Get the latest Euler data from the DCM. DCMUpdate is done
-    // inside the interrupt routine to insure it is not skipped and
-    // that the timing is consistent.
-    //
-    CompDCMComputeEulers(&g_sCompDCMInst, g_pfEulers, g_pfEulers + 1, g_pfEulers + 2);
+      //
+      // Get Quaternions.
+      //
+      CompDCMComputeQuaternion(&g_sCompDCMInst, g_pfQuaternion);
 
-    //
-    // Get Quaternions.
-    //
-    CompDCMComputeQuaternion(&g_sCompDCMInst, g_pfQuaternion);
+      //
+      // convert mag data to micro-tesla for better human interpretation.
+      //
+      g_pfMag[0] *= 1e6;
+      g_pfMag[1] *= 1e6;
+      g_pfMag[2] *= 1e6;
 
-    //
-    // convert mag data to micro-tesla for better human interpretation.
-    //
-    g_pfMag[0] *= 1e6;
-    g_pfMag[1] *= 1e6;
-    g_pfMag[2] *= 1e6;
+      //
+      // Convert Eulers to degrees. 180/PI = 57.29...
+      // Convert Yaw to 0 to 360 to approximate compass headings.
+      //
+      //g_pfEulers[0] *= 57.295779513082320876798154814105f;
+      //g_pfEulers[1] *= 57.295779513082320876798154814105f;
+      //g_pfEulers[2] *= 57.295779513082320876798154814105f;
+      //if (g_pfEulers[2] < 0)
+      //{
+      //  g_pfEulers[2] += 360.0f;
+      //}
 
-    //
-    // Convert Eulers to degrees. 180/PI = 57.29...
-    // Convert Yaw to 0 to 360 to approximate compass headings.
-    //
-    //g_pfEulers[0] *= 57.295779513082320876798154814105f;
-    //g_pfEulers[1] *= 57.295779513082320876798154814105f;
-    //g_pfEulers[2] *= 57.295779513082320876798154814105f;
-    //if (g_pfEulers[2] < 0)
-    //{
-    //  g_pfEulers[2] += 360.0f;
-    //}
+      //
+      // Finished
+      //
+      break;
+    }
 
-    //
-    // Finished
-    //
-    break;
-  }
-
-    //
-    // An I2C error has occurred at some point. Usually these are due to
-    // asynchronous resets of the main MCU and the I2C peripherals. This
-    // can cause the slave to hold the bus and the MCU to think it cannot
-    // send.  In practice there are ways to clear this condition.  They are
-    // not implemented here.  To clear power cycle the board.
-    //
-  case MOTION_STATE_ERROR:
-  {
-    // nothing
-    break;
-  }
+      //
+      // An I2C error has occurred at some point. Usually these are due to
+      // asynchronous resets of the main MCU and the I2C peripherals. This
+      // can cause the slave to hold the bus and the MCU to think it cannot
+      // send.  In practice there are ways to clear this condition.  They are
+      // not implemented here.  To clear power cycle the board.
+      //
+    case MOTION_STATE_ERROR:
+    {
+      // nothing
+      break;
+    }
   }
 
   std::copy(g_pfAccel, g_pfAccel + 3, theMPU9150Representation.fAccel);

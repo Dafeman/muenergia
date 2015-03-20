@@ -16,6 +16,7 @@
 #include "ISL29023Representation.h"
 #include "SHT21Representation.h"
 #include "TMP006Representation.h"
+#include "SensorAccessRepresentation.h"
 
 class SensorCommon
 {
@@ -30,8 +31,13 @@ class SensorCommon
     char encodedStr[LPRF_TX_MAX_DATA_LEN];
 
     int buffLocation;
+    int receiveLocation;
+    int sendLocation;
+    const int syncPktLength;
+
     /*To identify the time series*/
     LPRFMetaRepresentation repMeta;
+    LPRFSyncRepresentation repSync;
 
     /*data offset in bytes*/
     enum
@@ -52,6 +58,8 @@ class SensorController: public SensorCommon, public LPRF_CONTROLLER
     const ISL29023Representation* theISL29023Representation;
     const SHT21Representation* theSHT21Representation;
     const TMP006Representation* theTMP006Representation;
+  public:
+    bool contentMsg;
 
   public:
     SensorController(const BMP180Representation* theBMP180Representation,
@@ -70,6 +78,7 @@ class SensorController: public SensorCommon, public LPRF_CONTROLLER
 class SensorTarget: public SensorCommon, public LPRF_TARGET
 {
   private:
+    const InterruptVectorRepresentation* theInterruptVectorRepresentation;
     BMP180Representation repBMP180;
     ISL29023Representation repISL29023;
     SHT21Representation repSHT21;
@@ -77,7 +86,7 @@ class SensorTarget: public SensorCommon, public LPRF_TARGET
     int32_t i32IntegerPart, i32FractionPart;
 
   public:
-    SensorTarget();
+    SensorTarget(const InterruptVectorRepresentation* theInterruptVectorRepresentation);
     uint8_t size() const;
     uint8_t* data() const;
     void execute();
@@ -94,7 +103,9 @@ MODULE(LPRFSensorControllerModule)
   REQUIRES(BMP180Representation) //
   REQUIRES(ISL29023Representation) //
   REQUIRES(SHT21Representation) //
-  REQUIRES(TMP006Representation)
+  REQUIRES(TMP006Representation) //
+  REQUIRES(InterruptVectorRepresentation) //
+  PROVIDES(SensorAccessRepresentation)
 END_MODULE
 class LPRFSensorControllerModule: public LPRFSensorControllerModuleBase
 {
@@ -105,7 +116,7 @@ class LPRFSensorControllerModule: public LPRFSensorControllerModuleBase
     LPRFSensorControllerModule();
     ~LPRFSensorControllerModule();
     void init();
-    void execute();
+    void update(SensorAccessRepresentation& theSensorAccessRepresentation);
 };
 
 MODULE(LPRFSensorTargetModule)

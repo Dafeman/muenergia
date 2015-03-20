@@ -11,10 +11,12 @@
 #include "framework/Template.h"
 #include "framework/InterruptVectorRepresentation.h"
 #include "MPU9150Representation.h"
+#include "SensorAccessRepresentation.h"
 
 MODULE(MPU9150Module)
   REQUIRES(InterruptVectorRepresentation) //
   PROVIDES(MPU9150Representation) //
+  USES(SensorAccessRepresentation) //
 END_MODULE
 class MPU9150Module: public MPU9150ModuleBase
 {

@@ -13,7 +13,7 @@ public class Main {
     public static void main(String[] args) {
         try {
             Serial serial = new Serial("/dev/ttyACM0", 115200, 'N', SerialPort.DATABITS_8, 1);
-            File output = new File("march_02_talk.txt");
+            File output = new File("03_19_2015.txt");
             MessageConsumer messageConsumer = new FileMessageConsumer(output);
             serial.addListener(messageConsumer);
 

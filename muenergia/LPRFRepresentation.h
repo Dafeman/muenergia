@@ -33,7 +33,9 @@ class LPRFSyncRepresentation: public LPRFSyncRepresentationBase
 {
   public:
     unsigned long ms; //
-    bool sendActivation;bool resetActivation;
+    bool sendActivation; //
+    bool resetActivation;
+
     LPRFSyncRepresentation() :
         ms(0), sendActivation(false), resetActivation(false)
     {

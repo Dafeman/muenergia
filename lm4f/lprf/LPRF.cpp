@@ -129,9 +129,12 @@ volatile uint_fast8_t g_vui8LinkState;
 uint8_t g_ui8LinkDestIndex;
 uint8_t g_ui8Sending;
 uint8_t g_ui8ConfigureLPRF;
+uint8_t g_ui8ConnectedLPRF = false;
 Vector<uint8_t> g_ui8LinkDestIndexVector;
 size_t nextDestIndexVector;
 uint8_t g_ui8SendActivation = false;
+//uint8_t g_ui8SendRoundRobin = false;
+//unsigned long g_ui32PrevSendActivationTime = 0;
 uint8_t g_ui8SetPairReq = false;
 extern uint_fast8_t g_ui8Buttons;
 
@@ -559,6 +562,7 @@ void RTI_PairCnf(uint8_t ui8Status, uint8_t ui8DestIndex, uint8_t ui8DevType)
       UARTprintf("IPv6=%02X:%02X:%02X:%02X:%02X:%02X:%02X:%02X\n", g_ieeeAddr[7], g_ieeeAddr[6],
           g_ieeeAddr[5], g_ieeeAddr[4], g_ieeeAddr[3], g_ieeeAddr[2], g_ieeeAddr[1], g_ieeeAddr[0]);
       g_ui8ConfigureLPRF = 1;
+      g_ui8ConnectedLPRF = 1;
     }
     else
     {
@@ -730,6 +734,7 @@ void RTI_SendDataCnf(uint8_t ui8Status)
   //
   g_tivaWare.LED.colorSetGreen(0x0);
   g_ui8Sending = 0;
+  //UARTprintf("RTI_SendDataCnf: %d\n", ui8Status);
 }
 
 //*****************************************************************************
@@ -830,6 +835,7 @@ void RTI_ReceiveDataInd(uint8_t ui8SrcIndex, uint8_t ui8ProfileId, uint16_t ui16
       target->receive(ui8SrcIndex, ui8ProfileId, ui16VendorID, ui8RXLinkQuality, ui8RXFlags,
           ui8Length, pui8Data);
       g_ui8SendActivation = true;
+      //g_ui8SendRoundRobin = true;
     }
   }
 
@@ -894,59 +900,59 @@ void RTI_AsynchMsgProcess(void)
     //UARTprintf("RTI_AsynchMsgProcess: %02X \n", sMsg.ui8CommandID);
     switch ((unsigned long) sMsg.ui8CommandID)
     {
-    case RTIS_CMD_ID_RTI_INIT_CNF:
-      RTI_InitCnf(sMsg.pui8Data[0]);
-      break;
+      case RTIS_CMD_ID_RTI_INIT_CNF:
+        RTI_InitCnf(sMsg.pui8Data[0]);
+        break;
 
-    case RTIS_CMD_ID_RTI_PAIR_CNF:
-      RTI_PairCnf(sMsg.pui8Data[0], sMsg.pui8Data[1], sMsg.pui8Data[2]);
-      break;
+      case RTIS_CMD_ID_RTI_PAIR_CNF:
+        RTI_PairCnf(sMsg.pui8Data[0], sMsg.pui8Data[1], sMsg.pui8Data[2]);
+        break;
 
-    case RTIS_CMD_ID_RTI_PAIR_ABORT_CNF:
-      RTI_PairAbortCnf(sMsg.pui8Data[0]);
-      break;
+      case RTIS_CMD_ID_RTI_PAIR_ABORT_CNF:
+        RTI_PairAbortCnf(sMsg.pui8Data[0]);
+        break;
 
-    case RTIS_CMD_ID_RTI_ALLOW_PAIR_CNF:
-      RTI_AllowPairCnf(sMsg.pui8Data[0], sMsg.pui8Data[1], sMsg.pui8Data[2]);
-      break;
+      case RTIS_CMD_ID_RTI_ALLOW_PAIR_CNF:
+        RTI_AllowPairCnf(sMsg.pui8Data[0], sMsg.pui8Data[1], sMsg.pui8Data[2]);
+        break;
 
-    case RTIS_CMD_ID_RTI_SEND_DATA_CNF:
-      RTI_SendDataCnf(sMsg.pui8Data[0]);
-      break;
+      case RTIS_CMD_ID_RTI_SEND_DATA_CNF:
+        RTI_SendDataCnf(sMsg.pui8Data[0]);
+        break;
 
-    case RTIS_CMD_ID_RTI_REC_DATA_IND:
-      RTI_ReceiveDataInd(sMsg.pui8Data[0], sMsg.pui8Data[1],
-          sMsg.pui8Data[2] | (sMsg.pui8Data[3] << 8), sMsg.pui8Data[4], sMsg.pui8Data[5],
-          sMsg.pui8Data[6], &sMsg.pui8Data[7]);
-      break;
+      case RTIS_CMD_ID_RTI_REC_DATA_IND:
+        RTI_ReceiveDataInd(sMsg.pui8Data[0], sMsg.pui8Data[1],
+            sMsg.pui8Data[2] | (sMsg.pui8Data[3] << 8), sMsg.pui8Data[4], sMsg.pui8Data[5],
+            sMsg.pui8Data[6], &sMsg.pui8Data[7]);
+        break;
 
-    case RTIS_CMD_ID_RTI_STANDBY_CNF:
-      RTI_StandbyCnf(sMsg.pui8Data[0]);
-      break;
+      case RTIS_CMD_ID_RTI_STANDBY_CNF:
+        RTI_StandbyCnf(sMsg.pui8Data[0]);
+        break;
 
-    case RTIS_CMD_ID_RTI_ENABLE_SLEEP_CNF:
-      RTI_EnableSleepCnf(sMsg.pui8Data[0]);
-      break;
+      case RTIS_CMD_ID_RTI_ENABLE_SLEEP_CNF:
+        RTI_EnableSleepCnf(sMsg.pui8Data[0]);
+        break;
 
-    case RTIS_CMD_ID_RTI_DISABLE_SLEEP_CNF:
-      RTI_DisableSleepCnf(sMsg.pui8Data[0]);
-      break;
+      case RTIS_CMD_ID_RTI_DISABLE_SLEEP_CNF:
+        RTI_DisableSleepCnf(sMsg.pui8Data[0]);
+        break;
 
-    case RTIS_CMD_ID_RTI_RX_ENABLE_CNF:
-      RTI_RxEnableCnf(sMsg.pui8Data[0]);
-      break;
+      case RTIS_CMD_ID_RTI_RX_ENABLE_CNF:
+        RTI_RxEnableCnf(sMsg.pui8Data[0]);
+        break;
 
-    case RTIS_CMD_ID_RTI_UNPAIR_CNF:
-      RTI_UnpairCnf(sMsg.pui8Data[0], sMsg.pui8Data[1]);
-      break;
+      case RTIS_CMD_ID_RTI_UNPAIR_CNF:
+        RTI_UnpairCnf(sMsg.pui8Data[0], sMsg.pui8Data[1]);
+        break;
 
-    case RTIS_CMD_ID_RTI_UNPAIR_IND:
-      RTI_UnpairInd(sMsg.pui8Data[0]);
-      break;
+      case RTIS_CMD_ID_RTI_UNPAIR_IND:
+        RTI_UnpairInd(sMsg.pui8Data[0]);
+        break;
 
-    default:
-      // nothing can be done here!
-      break;
+      default:
+        // nothing can be done here!
+        break;
     }
   }
 }
@@ -961,33 +967,33 @@ extern "C"
 // senddata function again, but we're probably hosed.
 //
 //*****************************************************************************
-void Timer4AIntHandler(void)
-{
+  void Timer4AIntHandler(void)
+  {
 
 //
 // Clear the interrupt
 //
-  TimerIntClear(TIMER4_BASE, TIMER_TIMA_TIMEOUT);
+    TimerIntClear(TIMER4_BASE, TIMER_TIMA_TIMEOUT);
 
 //
 // Print something to let us know via debug console that the watchdog
 // timed out
 //
-  //if (LPRF::getInstance().isController())
-  //  UARTprintf("Sam: watchdog for controller time out!\n");
-  //if (LPRF::getInstance().isTarget())
-  //  UARTprintf("Sam: watchdog for target     time out!\n");
-  TimerDisable(TIMER4_BASE, TIMER_A);
+    //if (LPRF::getInstance().isController())
+    //  UARTprintf("Sam: watchdog for controller time out!\n");
+    //if (LPRF::getInstance().isTarget())
+    //  UARTprintf("Sam: watchdog for target     time out!\n");
+    TimerDisable(TIMER4_BASE, TIMER_A);
 
 //
 // Clear the sending flag, which will make it so that the lprf module will
 // try to send the next packet, which will hopefully (??) get the system
 // back to a good state.
 //
-  g_ui8Sending = 0;
-  g_ui8SendActivation = true;
-  g_tivaWare.LED.colorSetRGB(0x4000, 0x0, 0x4000);
-}
+    g_ui8Sending = 0;
+    g_ui8SendActivation = true;
+    g_tivaWare.LED.colorSetRGB(0x4000, 0x0, 0x4000);
+  }
 
 }
 
@@ -1059,17 +1065,17 @@ void LPRF::update(void)
   {
     switch (g_ui8Buttons & ALL_BUTTONS)
     {
-    //
-    // Right button is pressed at startup.
-    //
-    case RIGHT_BUTTON:
-    {
-      g_tivaWare.LED.colorSetRGB(0x0, 0x4000, 0x4000);
-      g_ui8SetPairReq = true;
-      UARTprintf("hitting PairReq\n");
-      RTI_PairReq();
-      break;
-    }
+      //
+      // Right button is pressed at startup.
+      //
+      case RIGHT_BUTTON:
+      {
+        g_tivaWare.LED.colorSetRGB(0x0, 0x4000, 0x4000);
+        g_ui8SetPairReq = true;
+        UARTprintf("hitting PairReq\n");
+        RTI_PairReq();
+        break;
+      }
     }
   }
 
@@ -1098,7 +1104,10 @@ void LPRF::update(void)
   {
     // Enable receiver for the controller
     if (isDuplex())
+    {
+      UARTprintf("Enable: RTI_RxEnableReq\n");
       RTI_RxEnableReq(0xFFFE);
+    }
     g_ui8ConfigureLPRF = 0;
   }
 }
@@ -1137,6 +1146,11 @@ void LPRF::send()
     //
     if (LPRF::getInstance().isController())
     {
+      // FixMe:
+      // Re-enable receiver for the controller
+      if (isDuplex())
+       RTI_RxEnableReq(0xFFFE);
+
       if (!g_ui8Sending)
       {
         LPRF_CONTROLLER* controller = LPRF::getInstance().getController();
@@ -1150,7 +1164,7 @@ void LPRF::send()
             RTI_SendDataReq(g_ui8LinkDestIndex, RTI_PROFILE_ZRC, RTI_VENDOR_TEXAS_INSTRUMENTS,
                 ui8TXOptions, controller->size(), controller->data());
             controller->reset();
-            TimerLoadSet(TIMER4_BASE, TIMER_A, g_tivaWare.CLOCK.ui32SysClock / 10);
+            TimerLoadSet(TIMER4_BASE, TIMER_A, /*1 s*/g_tivaWare.CLOCK.ui32SysClock);
             TimerEnable(TIMER4_BASE, TIMER_A);
           }
         }
@@ -1169,13 +1183,14 @@ void LPRF::send()
           target->execute();
           if ((target->size() > 0) && (target->size() < (NPI_MAX_DATA_LEN - 6)))
           {
+            //UARTprintf("target sending ....\n");
             g_ui8Sending = 1;
             g_ui8SendActivation = false;
             RTI_SendDataReq(g_ui8LinkDestIndexVector[nextDestIndexVector], RTI_PROFILE_ZRC,
             RTI_VENDOR_TEXAS_INSTRUMENTS, ui8TXOptions, target->size(), target->data());
             target->reset();
             nextDestIndexVector = (nextDestIndexVector + 1) % g_ui8LinkDestIndexVector.size();
-            TimerLoadSet(TIMER4_BASE, TIMER_A, g_tivaWare.CLOCK.ui32SysClock / 10);
+            TimerLoadSet(TIMER4_BASE, TIMER_A, 15/*10s*/* g_tivaWare.CLOCK.ui32SysClock /*/ 10*/);
             TimerEnable(TIMER4_BASE, TIMER_A);
           }
         }
@@ -1242,6 +1257,11 @@ LPRF_CONTROLLER* LPRF::getController() const
 const uint8_t* LPRF::getIEEEAddr() const
 {
   return g_ieeeAddr;
+}
+
+bool LPRF::getConnected() const
+{
+  return g_ui8ConnectedLPRF;
 }
 
 ///////////////////////////////////////////////////////////////////////////////

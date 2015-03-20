@@ -139,7 +139,7 @@ NPI_ErrCallback(uint32_t ui32Error)
   //
   pui32ErrLog[ui32Index] = ui32Error;
   //##### INTERNAL BEGIN #####
-  //UARTprintf("NPI ERR: %d\n", ui32Error);
+  UARTprintf("NPI ERR: %d\n", ui32Error);
   if (ui32Error == 1)
   {
     g_pui32RGBColors[RED] = 0x4000;

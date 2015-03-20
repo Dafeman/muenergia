@@ -68,6 +68,7 @@ class LPRF
     LPRF_TARGET* getTarget() const;
     LPRF_CONTROLLER* getController() const;
     const uint8_t* getIEEEAddr() const;
+    bool getConnected() const;
 };
 
 #endif /* LPRF_H_ */

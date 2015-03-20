@@ -270,7 +270,8 @@ class LPRFWrapper
 {
   public:
     bool active; //
-    bool isTarget;bool isDuplex;
+    bool isTarget; //
+    bool isDuplex; //
     uint32_t maxControllers;
     uint32_t maxPairingTries;
     LPRF& theLPRF;
@@ -287,6 +288,7 @@ class LPRFWrapper
         theLPRF.thisNodeType(LPRF::LPRF_TARGET_TYPE);
       else
         theLPRF.thisNodeType(LPRF::LPRF_CONTROLLER_TYPE);
+      theLPRF.thisDuplex(isDuplex);
       theLPRF.init();
     }
 
