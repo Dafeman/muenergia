@@ -28,3 +28,4 @@ class MPU9150Module: public MPU9150ModuleBase
 };
 
 #endif /* MPU9150MODULE_H_ */
+

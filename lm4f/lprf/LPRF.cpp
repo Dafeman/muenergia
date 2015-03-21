@@ -133,8 +133,7 @@ uint8_t g_ui8ConnectedLPRF = false;
 Vector<uint8_t> g_ui8LinkDestIndexVector;
 size_t nextDestIndexVector;
 uint8_t g_ui8SendActivation = false;
-//uint8_t g_ui8SendRoundRobin = false;
-//unsigned long g_ui32PrevSendActivationTime = 0;
+unsigned long g_ui32SendActivationTime = 0;
 uint8_t g_ui8SetPairReq = false;
 extern uint_fast8_t g_ui8Buttons;
 
@@ -1149,7 +1148,7 @@ void LPRF::send()
       // FixMe:
       // Re-enable receiver for the controller
       if (isDuplex())
-       RTI_RxEnableReq(0xFFFE);
+        RTI_RxEnableReq(0xFFFE);
 
       if (!g_ui8Sending)
       {
@@ -1173,6 +1172,14 @@ void LPRF::send()
 
     if (LPRF::getInstance().isTarget() && isDuplex())
     {
+      if (!g_ui8SendActivation
+          && (g_ui8LinkDestIndexVector.size() == g_tivaWare.LPRF.maxControllers)
+          && ((millis() - g_ui32SendActivationTime) > 12000))
+      {
+        // Something is wrong with a controller
+        g_ui8SendActivation = true; // Force the activation
+      }
+
       if (!g_ui8Sending && g_ui8SendActivation
           && (g_ui8LinkDestIndexVector.size() == g_tivaWare.LPRF.maxControllers))
       {
@@ -1186,6 +1193,7 @@ void LPRF::send()
             //UARTprintf("target sending ....\n");
             g_ui8Sending = 1;
             g_ui8SendActivation = false;
+            g_ui32SendActivationTime = millis();
             RTI_SendDataReq(g_ui8LinkDestIndexVector[nextDestIndexVector], RTI_PROFILE_ZRC,
             RTI_VENDOR_TEXAS_INSTRUMENTS, ui8TXOptions, target->size(), target->data());
             target->reset();

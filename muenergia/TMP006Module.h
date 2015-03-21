@@ -26,3 +26,4 @@ class TMP006Module: public TMP006ModuleBase
 };
 
 #endif /* TMP006MODULE_H_ */
+

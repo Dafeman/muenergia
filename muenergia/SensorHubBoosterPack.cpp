@@ -34,3 +34,4 @@ MAKE_MODULE(LPRFSensorControllerModule);
 //MAKE_MODULE(MPU9150Module)
 //MAKE_MODULE(LPRFModule) // This is the radio connected to EM headers
 //MAKE_MODULE(BQ27510G3Module)
+

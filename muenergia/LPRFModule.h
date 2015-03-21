@@ -117,3 +117,4 @@ class LPRFModule: public LPRFModuleBase
 };
 
 #endif /* LPRFMODULE_H_ */
+

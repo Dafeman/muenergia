@@ -49,3 +49,4 @@ class LPRFSyncRepresentation: public LPRFSyncRepresentationBase
 };
 
 #endif /* LPRFREPRESENTATION_H_ */
+

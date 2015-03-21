@@ -28,3 +28,4 @@ class ISL29023Module: public ISL29023ModuleBase
 
 
 #endif /* ISL29023MODULE_H_ */
+

@@ -192,3 +192,4 @@ void BMP180Module::update(BMP180Representation& theBMP180Representation)
   //tivaWare.UART.printf("\n");
 }
 
+

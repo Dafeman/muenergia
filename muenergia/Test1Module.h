@@ -24,3 +24,4 @@ class Test1Module: public Test1ModuleBase
 };
 
 #endif /* TEST1MODULE_H_ */
+

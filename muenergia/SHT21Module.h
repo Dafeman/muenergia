@@ -20,3 +20,4 @@ class SHT21Module: public SHT21ModuleBase
     void update(SHT21Representation& theSHT21Representation);
 };
 
+

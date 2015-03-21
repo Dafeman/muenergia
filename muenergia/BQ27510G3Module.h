@@ -22,3 +22,4 @@ class BQ27510G3Module: public BQ27510G3ModuleBase
 };
 
 #endif /* BQ27510G3MODULE_H_ */
+

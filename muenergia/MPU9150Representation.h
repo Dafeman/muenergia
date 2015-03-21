@@ -44,3 +44,4 @@ class MPU9150Representation: public MPU9150RepresentationBase
 };
 
 #endif /* MPU9150REPRESENTATION_H_ */
+

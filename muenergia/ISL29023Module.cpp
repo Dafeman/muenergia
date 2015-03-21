@@ -394,3 +394,4 @@ void ISL29023Module::update(ISL29023Representation& theISL29023Representation)
   }
 }
 
+

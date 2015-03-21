@@ -1068,3 +1068,4 @@ void BQ27510G3Module::execute()
   CheckForUserCommands();
 }
 
+

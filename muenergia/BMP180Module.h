@@ -26,3 +26,4 @@ class BMP180Module: public BMP180ModuleBase
 };
 
 #endif /* BMP180MODULE_H_ */
+

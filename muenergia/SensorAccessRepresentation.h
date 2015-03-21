@@ -19,3 +19,4 @@ class SensorAccessRepresentation : public SensorAccessRepresentationBase
 };
 
 #endif /* SENSORACCESSREPRESENTATION_H_ */
+

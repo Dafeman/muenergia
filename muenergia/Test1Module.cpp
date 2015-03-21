@@ -299,3 +299,4 @@ void printHex(int num, int precision)
 }
 
 #endif
+

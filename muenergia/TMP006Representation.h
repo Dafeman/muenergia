@@ -29,3 +29,4 @@ class TMP006Representation: public TMP006RepresentationBase
 };
 
 #endif /* TMP006REPRESENTATION_H_ */
+

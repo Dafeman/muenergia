@@ -286,3 +286,4 @@ void TMP006Module::update(TMP006Representation& theTMP006Representation)
   //tivaWare.UART.printf("Object %3d.%03d\n", i32IntegerPart, i32FractionPart);
 }
 
+

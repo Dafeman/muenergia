@@ -28,3 +28,4 @@ class ISL29023Representation: public ISL29023RepresentationBase
 };
 
 #endif /* ISL29023REPRESENTATION_H_ */
+

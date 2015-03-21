@@ -17,3 +17,4 @@ class Test1Representation: public Test1RepresentationBase
 };
 
 #endif /* TEST1REPRESENTATION_H_ */
+

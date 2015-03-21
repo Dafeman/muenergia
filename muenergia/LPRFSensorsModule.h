@@ -135,3 +135,4 @@ class LPRFSensorTargetModule: public LPRFSensorTargetModuleBase
 };
 
 #endif /* LPRFSENSORSMODULE_H_ */
+

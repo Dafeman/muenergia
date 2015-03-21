@@ -30,3 +30,4 @@ class BMP180Representation: public BMP180RepresentationBase
 };
 
 #endif /* BMP180REPRESENTATION_H_ */
+

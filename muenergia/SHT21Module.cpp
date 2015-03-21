@@ -315,3 +315,4 @@ void SHT21Module::update(SHT21Representation& theSHT21Representation)
   ROM_SysCtlDelay(tivaWare.CLOCK.ui32SysClock / 3);
 }
 
+

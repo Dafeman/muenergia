@@ -29,3 +29,4 @@ class SHT21Representation: public SHT21RepresentationBase
 };
 
 #endif /* SHT21REPRESENTATION_H_ */
+
