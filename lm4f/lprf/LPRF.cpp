@@ -131,6 +131,7 @@ uint8_t g_ui8Sending;
 uint8_t g_ui8ConfigureLPRF;
 uint8_t g_ui8ConnectedLPRF = false;
 Vector<uint8_t> g_ui8LinkDestIndexVector;
+Vector<uint8_t> g_ui8LinkDestHeartbeatVector;
 size_t nextDestIndexVector;
 uint8_t g_ui8SendActivation = false;
 unsigned long g_ui32SendActivationTime = 0;
@@ -649,6 +650,7 @@ void RTI_AllowPairCnf(uint8_t ui8Status, uint8_t ui8DestIndex, uint8_t ui8DevTyp
       ++g_ui32MaxAllowPairConfTries;
       UARTprintf("g_ui8LinkDestIndex=%d\n", g_ui8LinkDestIndex);
       g_ui8LinkDestIndexVector.push_back(g_ui8LinkDestIndex);
+      g_ui8LinkDestHeartbeatVector.push_back(0);
 
       if (g_ui8LinkDestIndexVector.size() == g_tivaWare.LPRF.maxControllers)
       {
@@ -1176,6 +1178,11 @@ void LPRF::send()
           && (g_ui8LinkDestIndexVector.size() == g_tivaWare.LPRF.maxControllers)
           && ((millis() - g_ui32SendActivationTime) > 12000))
       {
+        if (g_ui8LinkDestHeartbeatVector[nextDestIndexVector] < 10)
+          g_ui8LinkDestHeartbeatVector[nextDestIndexVector]++;
+        UARTprintf("idx: %d backoff: %d \n", nextDestIndexVector,
+            g_ui8LinkDestHeartbeatVector[nextDestIndexVector]);
+
         // Something is wrong with a controller
         g_ui8SendActivation = true; // Force the activation
       }
@@ -1194,12 +1201,31 @@ void LPRF::send()
             g_ui8Sending = 1;
             g_ui8SendActivation = false;
             g_ui32SendActivationTime = millis();
-            RTI_SendDataReq(g_ui8LinkDestIndexVector[nextDestIndexVector], RTI_PROFILE_ZRC,
-            RTI_VENDOR_TEXAS_INSTRUMENTS, ui8TXOptions, target->size(), target->data());
-            target->reset();
             nextDestIndexVector = (nextDestIndexVector + 1) % g_ui8LinkDestIndexVector.size();
-            TimerLoadSet(TIMER4_BASE, TIMER_A, 15/*10s*/* g_tivaWare.CLOCK.ui32SysClock /*/ 10*/);
-            TimerEnable(TIMER4_BASE, TIMER_A);
+
+            const int startDest = nextDestIndexVector;
+            bool sendToNextDevice = true;
+
+            while (g_ui8LinkDestHeartbeatVector[nextDestIndexVector] >= 10)
+            {
+              nextDestIndexVector = (nextDestIndexVector + 1) % g_ui8LinkDestIndexVector.size();
+              if (startDest == nextDestIndexVector)
+              {
+                sendToNextDevice = false;
+                UARTprintf("backoff from all devices\n");
+                break;
+              }
+            }
+
+            if (sendToNextDevice)
+            {
+              RTI_SendDataReq(g_ui8LinkDestIndexVector[nextDestIndexVector], RTI_PROFILE_ZRC,
+              RTI_VENDOR_TEXAS_INSTRUMENTS, ui8TXOptions, target->size(), target->data());
+              target->reset();
+              TimerLoadSet(TIMER4_BASE, TIMER_A, 15/*10s*/* g_tivaWare.CLOCK.ui32SysClock /*/ 10*/);
+              TimerEnable(TIMER4_BASE, TIMER_A);
+            } else
+              g_ui8SendActivation = false;
           }
         }
       }
