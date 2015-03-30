@@ -1,0 +1,25 @@
+First floor: 4.40 pm
+
+a)
+
+Humidity	61%
+Wind Speed	S 20 G 25 mph
+Barometer	29.96 in (1014.4 mb)
+Dewpoint	70°F (21°C)
+Visibility	10.00 mi
+Heat Index	90°F (32°C)
+Last update on	26 Mar 3:53 pm EDT
+85/29
+
+b)
+
+Humidity	61%
+Wind Speed	S 20 G 25 mph
+Barometer	29.96 in (1014.4 mb)
+Dewpoint	70°F (21°C)
+Visibility	10.00 mi
+Heat Index	90°F (32°C)
+Last update on	26 Mar 3:53 pm EDT
+85/29
+
+
