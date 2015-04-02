@@ -3,8 +3,9 @@
 clear; close all; clc;
 
 % spec
-data_dir = {'03_02_2015',  '03_23_2015', '03_25_2015', '03_30_2015'};
-meta_dir = {'One', 'Five', 'Six', 'Seven'};
+data_dir = {'03_02_2015',  '03_23_2015', '03_25_2015', ...
+            '03_30_2015', '04_01_2015'};
+meta_dir = {'03/02', '03/23', '03/25', '03/30', '04/01'};
 titles = {'BMP180 Tem', 'BMP180 Pre', 'BMP180 Alt', ...
               'ISL29023 Lig', 'SHT21 Hum', ...
               'SHT21 Tem', 'TMP006 Tem'};
@@ -32,39 +33,27 @@ subplot_index = 1;
 figure;
 hold on;
 for dir_idx = 1 : length(data_dir)    
-    d7cd = strcat(data_dir{dir_idx}, '/', '7cd');
-    d7ef = strcat(data_dir{dir_idx}, '/', '7ef');
-    d8d4 = strcat(data_dir{dir_idx}, '/', '8d4');
-
-    Device_7cd = load(d7cd);
-    Device_7ed = load(d7ef);
-    Device_8d4 = load(d8d4);
-
-    % 
-    Device_7cd(:,2) = Device_7cd(:,2) / 100; % mbar
-    Device_7ed(:,2) = Device_7ed(:,2) / 100; % mbar
-    Device_8d4(:,2) = Device_8d4(:,2) / 100; % mbar
-
-    range_7cd = (1:size(Device_7cd, 1))';
-    range_7ed = (1:size(Device_7ed, 1))';
-    range_8d4 = (1:size(Device_8d4, 1))';
+    
+    [Device_7cd, Device_7ef, Device_8d4, range_7cd, range_7ef, range_8d4] ...
+         = get_device_data(data_dir{dir_idx});
+    
     
     if dir_idx == 1,
        Device_7cd_tmp = Device_7cd;
-       Device_7ed_tmp = Device_7ed;
+       Device_7ef_tmp = Device_7ef;
        Device_8d4_tmp = Device_8d4;
        
        range_7cd_tmp = range_7cd;
-       range_7ed_tmp = range_7ed;
+       range_7ef_tmp = range_7ef;
        range_8d4_tmp = range_8d4;
        
        
        Device_7cd = [];
-       Device_7ed = [];
+       Device_7ef = [];
        Device_8d4 = [];
        
        range_7cd = [];
-       range_7ed = [];
+       range_7ef = [];
        range_8d4 = [];
        
              
@@ -81,15 +70,15 @@ for dir_idx = 1 : length(data_dir)
            Device_7cd = [Device_7cd, column_values];
        end
        
-       for j = 1 : size(Device_7ed_tmp, 2)
+       for j = 1 : size(Device_7ef_tmp, 2)
            column_values = [];
-           for i = 1 : offset : size(Device_7ed_tmp, 1)
+           for i = 1 : offset : size(Device_7ef_tmp, 1)
                 sta_i = i;
-                end_i = min(size(Device_7ed_tmp, 1), i + offset - 1);
-                mean_value = mean(Device_7ed_tmp(sta_i:end_i,j));
+                end_i = min(size(Device_7ef_tmp, 1), i + offset - 1);
+                mean_value = mean(Device_7ef_tmp(sta_i:end_i,j));
                 column_values = [column_values; mean_value(:)];
            end
-           Device_7ed = [Device_7ed, column_values];
+           Device_7ef = [Device_7ef, column_values];
        end
        
        for j = 1 : size(Device_8d4_tmp, 2)
@@ -105,18 +94,18 @@ for dir_idx = 1 : length(data_dir)
        
        
         range_7cd = (1:size(Device_7cd, 1))';
-        range_7ed = (1:size(Device_7ed, 1))';
+        range_7ef = (1:size(Device_7ef, 1))';
         range_8d4 = (1:size(Device_8d4, 1))';   
        
        
     end
     
     size(Device_7cd)
-    size(Device_7ed)
+    size(Device_7ef)
     size(Device_8d4)
     
     size(range_7cd)
-    size(range_7ed)
+    size(range_7ef)
     size(range_8d4)
     
     
@@ -125,13 +114,16 @@ for dir_idx = 1 : length(data_dir)
         print_index = print_order(j);
         hold on;
         plot(range_7cd, Device_7cd(:, print_index));
-        plot(range_7ed, Device_7ed(:, print_index));
+        plot(range_7ef, Device_7ef(:, print_index));
         plot(range_8d4, Device_8d4(:, print_index));
         if dir_idx == 1,
             title(titles{print_index});
         end
         if j == 1 && subplot_index == 1,
-            legend('Door', 'Back' ,'Roof', 'Location', 'southeast');
+            legend('Door (7cd)', 'Back (7ef)' ,'Roof (8d4)', 'Location', 'southeast');
+        end
+        if mod(subplot_index, subplot_cols) == 1,
+           ylabel(meta_dir{dir_idx}, 'fontweight', 'bold', 'fontsize', 12); 
         end
         hold off;
         subplot_index = subplot_index + 1;
