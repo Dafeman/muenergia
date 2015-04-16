@@ -6,165 +6,8 @@
 // Description : IEEE journal paper sesnor pre-processing
 //============================================================================
 
-#include <iostream>
-#include <fstream>
-#include <sstream>
-#include <string>
-#include <vector>
-#include <unordered_map>
-#include <algorithm>
-#include <iterator>
-//
-#include <sys/types.h>
-#include <sys/stat.h>
-#include <unistd.h>
-
-/**
- * Process data
- */
-class IEEEMachine
-{
-  public:
-    IEEEMachine()
-    {
-    }
-
-    void process(const std::string& inputName, const std::string& outputDir)
-    {
-      std::cout << "inputName: " << inputName << " outputDir: " << outputDir << std::endl;
-
-      std::ifstream in(inputName.c_str());
-
-      validateOutputDir(outputDir);
-
-      std::vector<std::string> deviceNames;
-      populateDeviceNames(deviceNames);
-
-      std::vector<std::string> deviceOutNames;
-      populateDeviceOutNames(outputDir, deviceNames, deviceOutNames);
-
-      std::unordered_map<std::string, std::ofstream*> outstreams;
-      populateOutstreams(deviceNames, deviceOutNames, outstreams);
-
-      if (in.is_open())
-      {
-        std::string line;
-        std::vector<std::string> tokens;
-        int lineNumber = 0;
-        while (std::getline(in, line))
-        {
-          tokens.clear();
-          std::istringstream iss(line);
-          std::copy(std::istream_iterator<std::string>(iss), std::istream_iterator<std::string>(),
-              std::back_inserter(tokens));
-
-          std::unordered_map<std::string, std::ofstream*>::iterator iter = outstreams.find(
-              *tokens.begin());
-          if (iter != outstreams.end())
-          {
-            if ((tokens.size() > 10) || (tokens.size() < 9))
-            {
-              std::cerr << "Line: " << lineNumber << " str: " << line << std::endl;
-              continue;
-            }
-
-            bool validTokens = true;
-            for (size_t i = 1; i < 8; i++)
-            {
-              if (!validateDouble(tokens[i]))
-              {
-                validTokens = false;
-                std::cout << "Skip: " << lineNumber << " checkForDouble: " << tokens[i]
-                    << std::endl;
-                break;
-              }
-            }
-
-            if (validTokens)
-            {
-              for (size_t i = 1; i < 8; i++)
-                (*iter->second) << tokens[i] << " ";
-              (*iter->second) << std::endl;
-              iter->second->flush();
-            }
-          }
-
-          ++lineNumber;
-        }
-      }
-      else
-      {
-        std::cerr << "Error: file: " << inputName << " missing" << std::endl;
-      }
-
-      removeOutputStreams(outstreams);
-
-    }
-
-    void process(std::unordered_map<std::string, std::string>& in)
-    {
-      for (std::unordered_map<std::string, std::string>::const_iterator iter = in.begin();
-          iter != in.end(); ++iter)
-        process(iter->first, iter->second);
-    }
-
-  private:
-
-    void validateOutputDir(const std::string& outputDir) const
-    {
-      struct stat st =
-      { 0 };
-      if (stat(outputDir.c_str(), &st) == -1)
-      {
-        mkdir(outputDir.c_str(), 0700);
-        std::cout << "dir: " << outputDir << " has been created." << std::endl;
-      }
-      else
-        std::cout << "dir: " << outputDir << " exists." << std::endl;
-    }
-
-    bool validateDouble(std::string const& s) const
-    {
-      std::istringstream ss(s);
-      double d;
-      return (ss >> d) && (ss >> std::ws).eof();
-    }
-
-    void populateDeviceNames(std::vector<std::string>& deviceNames)
-    {
-      deviceNames.push_back("7ef");
-      deviceNames.push_back("7cd");
-      deviceNames.push_back("8d4");
-    }
-
-    void populateDeviceOutNames(const std::string& outputDir, std::vector<std::string>& deviceNames,
-        std::vector<std::string>& deviceOutNames) const
-    {
-      for (std::vector<std::string>::const_iterator iter = deviceNames.begin();
-          iter != deviceNames.end(); ++iter)
-        deviceOutNames.push_back(outputDir + (*iter));
-    }
-
-    void populateOutstreams(std::vector<std::string>& deviceNames,
-        std::vector<std::string>& deviceOutNames,
-        std::unordered_map<std::string, std::ofstream*>& outstreams) const
-    {
-      for (std::vector<std::string>::size_type i = 0; i < deviceNames.size(); ++i)
-        outstreams.emplace(deviceNames[i], new std::ofstream(deviceOutNames[i].c_str()));
-    }
-
-    void removeOutputStreams(std::unordered_map<std::string, std::ofstream*>& outstreams) const
-    {
-      for (std::unordered_map<std::string, std::ofstream*>::iterator iter = outstreams.begin();
-          iter != outstreams.end(); ++iter)
-      {
-        iter->second->close();
-        delete iter->second;
-      }
-
-      outstreams.clear();
-    }
-};
+#include "IEEEMachine.h"
+#include "IEEEClustering.h"
 
 void ieeeMachineSingleProcess()
 {
@@ -198,11 +41,44 @@ void ieeeMachineMultipleProcess()
   ieeeMachine.process(in);
 }
 
+void ieeeClusteringSingleProcess()
+{
+  std::string inFile = "/home/sam/Projects/muenergia/datasets/human/data-fall-forward.txt";
+  std::string outFile =
+      "/home/sam/Projects/muenergia/datasets/ieee_sensor_journal/ieee_human/data-fall-forward.txt";
+  IEEEClustering clustering(20);
+  clustering.process(inFile, outFile);
+}
+
+void ieeeClusteringMultipleProcess()
+{
+  std::unordered_map<std::string, std::string> in;
+  std::string inBase = "/home/sam/Projects/muenergia/datasets/human/";
+  std::string outBase = "/home/sam/Projects/muenergia/datasets/ieee_sensor_journal/ieee_human/";
+
+  in.emplace(inBase + "data-fall-backward.txt", outBase + "data-fall-backward.txt");
+  in.emplace(inBase + "data-fall-forward.txt", outBase + "data-fall-forward.txt");
+  in.emplace(inBase + "data-fall-left.txt", outBase + "data-fall-left.txt");
+  in.emplace(inBase + "data-fall-right.txt", outBase + "data-fall-right.txt");
+  in.emplace(inBase + "data-marching.txt", outBase + "data-marching.txt");
+  in.emplace(inBase + "data-rotate-ccw.txt", outBase + "data-rotate-ccw.txt");
+  in.emplace(inBase + "data-rotate-cw.txt", outBase + "data-rotate-cw.txt");
+  in.emplace(inBase + "data-seat-from-stand.txt", outBase + "data-seat-from-stand.txt");
+  in.emplace(inBase + "data-walk-backward.txt", outBase + "data-walk-backward.txt");
+  in.emplace(inBase + "data-walk-forward.txt", outBase + "data-walk-forward.txt");
+  in.emplace(inBase + "data-walk-left.txt", outBase + "data-walk-left.txt");
+  in.emplace(inBase + "data-walk-right.txt", outBase + "data-walk-right.txt");
+
+  IEEEClustering clustering(20);
+  clustering.process(in);
+}
+
 int main()
 {
   std::cout << "*** starts ***" << std::endl;
-  ieeeMachineSingleProcess();
+//  ieeeMachineSingleProcess();
 //  ieeeMachineMultipleProcess();
+  ieeeClusteringMultipleProcess();
   std::cout << "*** ends   ***" << std::endl;
   return 0;
 }

@@ -118,16 +118,17 @@ for dir_idx = 1 : length(data_dir)
         plot(range_8d4, Device_8d4(:, print_index));
         if dir_idx == 1,
             title(titles{print_index});
-        end
-        if j == 1 && subplot_index == 1,
-            legend('Door (7cd)', 'Back (7ef)' ,'Roof (8d4)', 'Location', 'southeast');
-        end
+        end        
         if mod(subplot_index, subplot_cols) == 1,
-           ylabel(meta_dir{dir_idx}, 'fontweight', 'bold', 'fontsize', 12); 
+           ylabel(meta_dir{dir_idx}, 'fontweight', 'bold', 'fontsize', 12);
+           ylim([24, 30]);
         end
         hold off;
         subplot_index = subplot_index + 1;
     end
- end
+end
+
+legend('Door (7cd)', 'Back (7ef)' ,'Roof (8d4)', 'Location', 'southeast');
+       
 hold off;
 %suptitle([meta_dir{dir_idx}]);

@@ -18,11 +18,11 @@ function [Device_7cd, Device_7ef, Device_8d4, range_7cd, range_7ef, range_8d4] .
     range_8d4 = (1:size(Device_8d4, 1))';
     
     
-    size(Device_7cd)
-    size(Device_7ef)
-    size(Device_8d4)
+    size(Device_7cd);
+    size(Device_7ef);
+    size(Device_8d4);
     
-    size(range_7cd)
-    size(range_7ef)
-    size(range_8d4)
+    size(range_7cd);
+    size(range_7ef);
+    size(range_8d4);
 end
