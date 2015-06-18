@@ -10,8 +10,8 @@ input_files = {'data-fall-backward.txt', 'data-fall-forward.txt', ...
                'data-walk-left.txt', 'data-walk-right.txt'};
            
 train_X = [];
-shift = 1;
-for f = 1 + shift : 1 + shift%length(input_files)
+shift = 11;
+for f = 5 : 11%length(input_files)
     tmp = load(input_files{f});
     tmp = tmp(112:end,1:6);
     size(tmp)
@@ -35,10 +35,10 @@ for f = 1 + shift : 1 + shift%length(input_files)
     plot(kmean_train_X);
     
     name = strcat('event_data.', input_files{f})
-    if 0,
+    if 1, % 1 means normal
         
         window_size = 15
-        data_length = 15 * 20
+        data_length = window_size * 20
         X_extract = kmean_train_X(m-data_length+1:end,:);
         size(X_extract)
 
@@ -59,72 +59,77 @@ for f = 1 + shift : 1 + shift%length(input_files)
         plot(extract_event_data);
         dlmwrite(name, extract_event_data);
 
-    end
-
-    numClusters = 2;
-
-    %kmean_train_X = train_X;
-
-    [train_labels, C] = kmeans(kmean_train_X, numClusters);
-
-    C_norm = zeros(numClusters, 6);
-    %for i = 1 : numClusters
-    %   C_norm(i,:) = C(i,:) / norm(C(i,:), 2); 
-    %end
-
-
-    hold on;
-    plot(kmean_train_X);
-    plot(0.05 * train_labels, 'o');
-    hold off;
-
-    % clrude hack
-
-    cluster_index = train_labels(1)
-    event_A = [];
-    event_B = [];
-
-    current_data = kmean_train_X(1,:);
-    for i = 2 : m
-        if cluster_index == train_labels(i),
-            current_data = [current_data; kmean_train_X(i,:)];
-        else
-            % Old data
-            current_data_avg = mean(current_data, 1);
-
-            if cluster_index == 1,
-                event_A = [event_A; current_data_avg];
-            else
-                event_B = [event_B; current_data_avg];
-            end
-
-            % New data
-            cluster_index = train_labels(i);
-            current_data = kmean_train_X(i,:);
-        end
-    end
-
-    % final value
-    %size(current_data)
-    current_data_avg = mean(current_data, 1);     
-    if cluster_index == 1,
-        event_A = [event_A; current_data_avg];
     else
-        event_B = [event_B; current_data_avg];
-    end
+
+        numClusters = 2;
+
+        %kmean_train_X = train_X;
+
+        [train_labels, C] = kmeans(kmean_train_X, numClusters);
+
+        C_norm = zeros(numClusters, 6);
+        %for i = 1 : numClusters
+        %   C_norm(i,:) = C(i,:) / norm(C(i,:), 2); 
+        %end
 
 
-    size(event_A)
-    size(event_B)
+        hold on;
+        plot(kmean_train_X);
+        plot(0.05 * train_labels, 'o');
+        hold off;
 
-    figure;
-    subplot(121); plot(event_A);
-    subplot(122); plot(event_B);
+        % clrude hack
 
+        cluster_index = train_labels(1)
+        event_A = [];
+        event_B = [];
+
+        current_data = kmean_train_X(1,:);
+        for i = 2 : m
+            if cluster_index == train_labels(i),
+                current_data = [current_data; kmean_train_X(i,:)];
+            else
+                % Old data
+                current_data_avg = mean(current_data, 1);
+
+                if cluster_index == 1,
+                    event_A = [event_A; current_data_avg];
+                else
+                    event_B = [event_B; current_data_avg];
+                end
+
+                % New data
+                cluster_index = train_labels(i);
+                current_data = kmean_train_X(i,:);
+            end
+        end
+
+        % final value
+        %size(current_data)
+        current_data_avg = mean(current_data, 1);     
+        if cluster_index == 1,
+            event_A = [event_A; current_data_avg];
+        else
+            event_B = [event_B; current_data_avg];
+        end
+
+
+        size(event_A)
+        size(event_B)
+
+        figure;
+        subplot(121); plot(event_A);
+        subplot(122); plot(event_B);
+
+
+        dlmwrite(name, event_A);
     
-    dlmwrite(name, event_A);
-
+    end
+    
 end
+
+
+% Old code
 return;
            
 for f =  2 : 2%length(input_files)           
